@@ -1,13 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using SocialConsultations.Entities;
 using System.ComponentModel.DataAnnotations;
-using System.Data;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SocialConsultations.Entities
+namespace SocialConsultations.Models
 {
-    public class User
+    public class UserForClientCreation
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
         [Required]
         [MinLength(1)]
         [MaxLength(20)]
@@ -23,8 +21,7 @@ namespace SocialConsultations.Entities
         [MaxLength(20)]
         public string Password { get; set; }
         [Required]
+        [EmailAddress]
         public string? Email { get; set; }
-        public bool Confirmed { get; set; } = false;
-
     }
 }

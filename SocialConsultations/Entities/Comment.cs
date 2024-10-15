@@ -3,16 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SocialConsultations.Entities
 {
-    public class Community
+    public class Comment
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-
         [Required]
-        [MinLength(7)]
-        [MaxLength(20)]
-        public string Name { get; set; }
-
-        public bool IsPublic { get; set; }
+        [MinLength(1)]
+        public string Content { get; set; }
+        public ICollection<User> Upvotes { get; set; } = new List<User>();
     }
 }

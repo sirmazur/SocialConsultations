@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Serialization;
+using SocialConsultations.DbContexts;
 using SocialConsultations.Helpers;
 using System;
 using System.Reflection;
@@ -75,7 +76,7 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(xmlPath);
 });
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddDbContext<PersonDbContext>(options =>
+builder.Services.AddDbContext<ConsultationsContext>(options =>
     options.UseSqlServer(connection));
 builder.Configuration.AddEnvironmentVariables();
 var app = builder.Build();
