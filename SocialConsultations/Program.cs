@@ -2,11 +2,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using SocialConsultations.DbContexts;
+using SocialConsultations.Entities;
 using SocialConsultations.Helpers;
+using SocialConsultations.Services.Basic;
+using SocialConsultations.Services.FieldsValidationServices;
+using SocialConsultations.Services.UserServices;
 using System;
 using System.Reflection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,9 +51,14 @@ builder.Services.AddControllers(options =>
         };
     };
 });
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.Configure<MvcOptions>(options =>
+{
+    var newtonsoftJsonOutputFormatter = options.OutputFormatters
+        .OfType<NewtonsoftJsonOutputFormatter>()?.FirstOrDefault();
+
+});
+
 var connection = String.Empty;
 if (builder.Environment.IsDevelopment())
 {
@@ -59,26 +70,57 @@ else
     connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
 }
 
-builder.Services.Configure<MvcOptions>(options =>
-{
-    var newtonsoftJsonOutputFormatter = options.OutputFormatters
-        .OfType<NewtonsoftJsonOutputFormatter>()?.FirstOrDefault();
-
-});
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SchemaFilter<EnumSchemaFilter>();
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+//builder.Services.AddSwaggerGen(options =>
+//{
+//    options.SchemaFilter<EnumSchemaFilter>();
+//    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+//    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 
-    options.IncludeXmlComments(xmlPath);
-});
+//    options.IncludeXmlComments(xmlPath);
+//});
+builder.Services.AddSwaggerGen();
+builder.Services.AddTransient<IFieldsValidationService, FieldsValidationService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IBasicRepository<User>, BasicRepository<User>>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddDbContext<ConsultationsContext>(options =>
     options.UseSqlServer(connection));
-builder.Configuration.AddEnvironmentVariables();
+builder.Services.AddResponseCaching();
+builder.Services.AddHttpCacheHeaders(
+       (expirationModelOptions) =>
+       {
+           expirationModelOptions.MaxAge = 180;
+           expirationModelOptions.CacheLocation = Marvin.Cache.Headers.CacheLocation.Private;
+       },
+       (validationModelOptions) =>
+       {
+           validationModelOptions.MustRevalidate = true;
+       });
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Authentication:Issuer"],
+            ValidAudience = builder.Configuration["Authentication:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.ASCII.GetBytes(builder.Configuration["Authentication:SecretForKey"]))
+        };
+    }
+    );
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("MustBeLoggedIn", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+    });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

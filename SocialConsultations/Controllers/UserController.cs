@@ -55,13 +55,12 @@ namespace SocialConsultations.Controllers
         /// <param name="mediaType"></param>
         /// <returns></returns>
         [Produces("application/json",
-          "application/vnd.capparel.hateoas+json",
-          "application/vnd.capparel.user.full+json",
-          "application/vnd.capparel.user.full.hateoas+json",
-          "application/vnd.capparel.user.friendly+json",
-          "application/vnd.capparel.user.friendly.hateoas+json")]
+          "application/vnd.socialconsultations.hateoas+json",
+          "application/vnd.socialconsultations.user.full+json",
+          "application/vnd.socialconsultations.user.full.hateoas+json",
+          "application/vnd.socialconsultations.user.friendly+json",
+          "application/vnd.socialconsultations.user.friendly.hateoas+json")]
         [HttpGet(Name = "GetUsers")]
-        [Authorize(Policy = "MustBeAdmin")]
         [HttpHead]
         public async Task<IActionResult> GetUsers([FromQuery] IEnumerable<int>? ids, [FromQuery] ResourceParameters resourceParameters, [FromHeader(Name = "Accept")] string? mediaType)
         {
@@ -97,7 +96,7 @@ namespace SocialConsultations.Controllers
 
             IEnumerable<ExpandoObject> shapedUsers = new List<ExpandoObject>();
             IEnumerable<IDictionary<string, object?>>? shapedUsersToReturn = new List<IDictionary<string, object?>>();
-            if (primaryMediaType == "vnd.capparel.user.full")
+            if (primaryMediaType == "vnd.socialconsultations.user.full")
             {
                 PagedList<UserFullDto>? users = null;
                 try
@@ -330,11 +329,11 @@ namespace SocialConsultations.Controllers
         /// <param name="mediaType"></param>
         /// <returns></returns>
         [Produces("application/json",
-            "application/vnd.capparel.hateoas+json",
-            "application/vnd.capparel.user.full+json",
-            "application/vnd.capparel.user.full.hateoas+json",
-            "application/vnd.capparel.user.friendly+json",
-            "application/vnd.capparel.user.friendly.hateoas+json")]
+            "application/vnd.socialconsultations.hateoas+json",
+            "application/vnd.socialconsultations.user.full+json",
+            "application/vnd.socialconsultations.user.full.hateoas+json",
+            "application/vnd.socialconsultations.user.friendly+json",
+            "application/vnd.socialconsultations.user.friendly.hateoas+json")]
         [Authorize(Policy = "MustBeAdmin")]
         [HttpGet("{userid}", Name = "GetUser")]
         public async Task<IActionResult> GetUser(
@@ -375,7 +374,7 @@ namespace SocialConsultations.Controllers
                 0, parsedMediaType.SubTypeWithoutSuffix.Length - 8) :
                 parsedMediaType.SubTypeWithoutSuffix;
 
-            if (primaryMediaType == "vnd.capparel.user.full")
+            if (primaryMediaType == "vnd.socialconsultations.user.full")
             {
                 var fullItem = await _userService.GetExtendedByIdWithEagerLoadingAsync(userid);
                 var fullResourceToReturn = fullItem.ShapeDataForObject(fields) as IDictionary<string, object>;
@@ -402,11 +401,11 @@ namespace SocialConsultations.Controllers
         /// <param name="mediaType"></param>
         /// <returns></returns>
         [Produces("application/json",
-            "application/vnd.capparel.hateoas+json",
-            "application/vnd.capparel.user.full+json",
-            "application/vnd.capparel.user.full.hateoas+json",
-            "application/vnd.capparel.user.friendly+json",
-            "application/vnd.capparel.user.friendly.hateoas+json")]
+            "application/vnd.socialconsultations.hateoas+json",
+            "application/vnd.socialconsultations.user.full+json",
+            "application/vnd.socialconsultations.user.full.hateoas+json",
+            "application/vnd.socialconsultations.user.friendly+json",
+            "application/vnd.socialconsultations.user.friendly.hateoas+json")]
         [Authorize(Policy = "MustBeLoggedIn")]
         [HttpGet("self",Name = "GetSelf")]
         public async Task<IActionResult> GetSelf(
@@ -446,7 +445,7 @@ namespace SocialConsultations.Controllers
                 0, parsedMediaType.SubTypeWithoutSuffix.Length - 8) :
                 parsedMediaType.SubTypeWithoutSuffix;
 
-            if (primaryMediaType == "vnd.capparel.user.full")
+            if (primaryMediaType == "vnd.socialconsultations.user.full")
             {
                 var fullItem = await _userService.GetExtendedByIdWithEagerLoadingAsync(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value));
                 var fullResourceToReturn = fullItem.ShapeDataForObject(fields) as IDictionary<string, object>;
@@ -525,28 +524,6 @@ namespace SocialConsultations.Controllers
             else
             {
                 return StatusCode(operationResult.HttpResponseCode, operationResult.ErrorMessage);
-            }
-        }
-
-        /// <summary>
-        /// Sets user's balance to provided amount
-        /// </summary>
-        /// <param name="userid"></param>
-        /// <param name="amount"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        [Authorize(Policy = "MustBeLoggedIn")]
-        [HttpPost("{userid}/balance/{amount}")]
-        public async Task<UserDto> TopUp(int userid, double amount)
-        {
-            try
-            {
-                var userToReturn = await _userService.TopUp(userid, amount);
-                return userToReturn;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
             }
         }
 
