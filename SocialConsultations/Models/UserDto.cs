@@ -13,7 +13,7 @@ namespace SocialConsultations.Models
 
         public string Surname { get; set; }
 
-        public string? Email { get; set; }
+        public string Email { get; set; }
 
         public bool Confirmed { get; set; } = false;
 

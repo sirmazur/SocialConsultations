@@ -23,7 +23,11 @@ namespace SocialConsultations.Entities
         [MaxLength(20)]
         public string Password { get; set; }
         [Required]
-        public string? Email { get; set; }
+        public string Email { get; set; }
+        [Required]
+        public DateTime BirthDate { get; set; }
+        [Required]
+        public Guid ConfirmationCode { get; set; }
         public bool Confirmed { get; set; } = false;
 
     }

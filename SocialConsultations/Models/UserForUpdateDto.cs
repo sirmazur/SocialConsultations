@@ -22,7 +22,7 @@ namespace SocialConsultations.Models
         [MaxLength(20)]
         public string Password { get; set; }
         [Required]
-        public string? Email { get; set; }
+        public string Email { get; set; }
 
     }
 }
