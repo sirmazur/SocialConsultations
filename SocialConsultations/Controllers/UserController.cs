@@ -11,6 +11,8 @@ using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using System.Dynamic;
 using System.Security.Claims;
+using Marvin.Cache.Headers.Interfaces;
+using Marvin.Cache.Headers;
 
 namespace SocialConsultations.Controllers
 {
@@ -21,11 +23,16 @@ namespace SocialConsultations.Controllers
         private readonly IUserService _userService;
         private readonly ProblemDetailsFactory _problemDetailsFactory;
         private readonly IFieldsValidationService _fieldsValidationService;
-        public UserController(IUserService userService, ProblemDetailsFactory problemDetailsFactory, IFieldsValidationService fieldsValidationService)
+        private readonly IValidatorValueInvalidator _validatorValueInvalidator;
+        private readonly IStoreKeyAccessor _storeKeyAccessor;
+
+        public UserController(IUserService userService, ProblemDetailsFactory problemDetailsFactory, IFieldsValidationService fieldsValidationService, IValidatorValueInvalidator validatorValueInvalidator, IStoreKeyAccessor storeKeyAccessor)
         {
             _userService = userService;
             _problemDetailsFactory = problemDetailsFactory;
             _fieldsValidationService = fieldsValidationService;
+            _validatorValueInvalidator = validatorValueInvalidator;
+            _storeKeyAccessor = storeKeyAccessor;
         }
 
         /// <summary>
@@ -39,6 +46,9 @@ namespace SocialConsultations.Controllers
             try
             {
                 var result = await _userService.CreateUser(user);
+
+                var keys = _storeKeyAccessor.FindByCurrentResourcePath().ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys);
                 return CreatedAtRoute("GetUser", new { userid = result.Id }, result);
             }
             catch (Exception e)

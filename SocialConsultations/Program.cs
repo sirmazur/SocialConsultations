@@ -1,3 +1,5 @@
+using Marvin.Cache.Headers;
+using Marvin.Cache.Headers.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -87,6 +89,8 @@ builder.Services.AddTransient<IFieldsValidationService, FieldsValidationService>
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBasicRepository<User>, BasicRepository<User>>();
+builder.Services.AddScoped<IStoreKeyAccessor, StoreKeyAccessor>();
+builder.Services.AddScoped<IValidatorValueInvalidator, ValidatorValueInvalidator>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddDbContext<ConsultationsContext>(options =>
     options.UseSqlServer(connection));
@@ -145,11 +149,12 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowSpecificOrigin");
 app.UseHttpsRedirection();
 
+app.UseHttpCacheHeaders();
+
 app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.UseHttpCacheHeaders();
 
 app.MapControllers();
 
