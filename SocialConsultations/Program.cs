@@ -98,7 +98,7 @@ builder.Services.AddResponseCaching();
 builder.Services.AddHttpCacheHeaders(
        (expirationModelOptions) =>
        {
-           expirationModelOptions.MaxAge = 180;
+           expirationModelOptions.MaxAge = 30;
            expirationModelOptions.CacheLocation = Marvin.Cache.Headers.CacheLocation.Private;
        },
        (validationModelOptions) =>
