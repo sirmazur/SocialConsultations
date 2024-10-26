@@ -26,8 +26,10 @@ namespace SocialConsultations.Entities
         public string Email { get; set; }
         [Required]
         public DateTime BirthDate { get; set; }
-        [Required]
-        public Guid ConfirmationCode { get; set; }
+
+        public Guid ConfirmationCode { get; set; } = Guid.NewGuid();
+
+        public FileData? Avatar { get; set; }
         public bool Confirmed { get; set; } = false;
 
     }

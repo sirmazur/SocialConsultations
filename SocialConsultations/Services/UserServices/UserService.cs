@@ -19,11 +19,13 @@ namespace SocialConsultations.Services.UserServices
 
         private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
+        private readonly EmailSender _emailSender;
 
-        public UserService(IMapper mapper, IConfiguration configuration, IBasicRepository<User> basicRepository, IUserRepository userRepository) : base(mapper, basicRepository)
+        public UserService(IMapper mapper, IConfiguration configuration, IBasicRepository<User> basicRepository, IUserRepository userRepository, EmailSender emailSender) : base(mapper, basicRepository)
         {
             _configuration = configuration;
             _userRepository = userRepository;
+            _emailSender=emailSender;
         }
         public async Task<UserFullDto> AuthenticateUser(UserParams userParams)
         {
@@ -155,6 +157,9 @@ namespace SocialConsultations.Services.UserServices
 
             await _basicRepository.AddAsync(createdUser);
             await _basicRepository.SaveChangesAsync();
+            var url = $"{_configuration["SiteData:BaseUrl"]}"+$"api/authentication/confirm/{createdUser.ConfirmationCode}";
+            await _emailSender.SendEmailAsync(user.Email, "Confirm your account",
+                $"Please confirm your account by clicking <a href='{url}'>here</a>");
 
             return _mapper.Map<UserDto>(createdUser);
         }

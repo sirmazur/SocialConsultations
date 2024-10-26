@@ -91,6 +91,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBasicRepository<User>, BasicRepository<User>>();
 builder.Services.AddScoped<IStoreKeyAccessor, StoreKeyAccessor>();
 builder.Services.AddScoped<IValidatorValueInvalidator, ValidatorValueInvalidator>();
+builder.Services.AddTransient<EmailSender>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddDbContext<ConsultationsContext>(options =>
     options.UseSqlServer(connection));
