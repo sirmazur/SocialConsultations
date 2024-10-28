@@ -58,6 +58,28 @@ namespace SocialConsultations.Controllers
         }
 
         /// <summary>
+        /// Creates a user
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        [HttpPost("{code}")]
+        public async Task<ActionResult<UserDto>> ActivateUser(Guid code)
+        {
+            try
+            {
+                var result = await _userService.ActivateUser(code);
+
+                var keys = _storeKeyAccessor.FindByCurrentResourcePath().ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys);
+                return CreatedAtRoute("GetUser", new { userid = result.Id }, result);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        /// <summary>
         /// Gets users, requires admin token
         /// </summary>
         /// <param name="ids"></param>

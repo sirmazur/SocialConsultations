@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace SocialConsultations.Services.UserServices
 {
@@ -39,6 +40,26 @@ namespace SocialConsultations.Services.UserServices
                 return _mapper.Map<UserFullDto>(account);
             }
 
+        }
+
+        public async Task<UserFullDto> ActivateUser(Guid code)
+        {
+            var user = await _basicRepository.GetQueryableAll().SingleOrDefaultAsync(c => c.ConfirmationCode == code);
+            if (user == null)
+            {
+                throw new Exception("Activation code is not vaild");
+            }
+            else
+            if(user.Confirmed == true)
+            {
+                throw new Exception("Email is already confirmed");
+            }
+            else
+            {
+                user.Confirmed = true;
+                await _basicRepository.SaveChangesAsync();
+                return _mapper.Map<UserFullDto>(user);
+            }
         }
 
         public async override Task<PagedList<UserFullDto>> GetFullAllWithEagerLoadingAsync(IEnumerable<IFilter>? filters,
@@ -157,7 +178,7 @@ namespace SocialConsultations.Services.UserServices
 
             await _basicRepository.AddAsync(createdUser);
             await _basicRepository.SaveChangesAsync();
-            var url = $"{_configuration["SiteData:BaseUrl"]}"+$"api/authentication/confirm/{createdUser.ConfirmationCode}";
+            var url = $"{_configuration["SiteData:BaseUrl"]}"+$"api/users/{createdUser.ConfirmationCode}";
             await _emailSender.SendEmailAsync(user.Email, "Confirm your account",
                 $"Please confirm your account by clicking <a href='{url}'>here</a>");
 
