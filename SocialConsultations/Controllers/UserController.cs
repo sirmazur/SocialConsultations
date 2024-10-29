@@ -62,14 +62,14 @@ namespace SocialConsultations.Controllers
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
-        [HttpPost("{code}")]
+        [HttpPost("confirm/{code}")]
         public async Task<ActionResult<UserDto>> ActivateUser(Guid code)
         {
             try
             {
                 var result = await _userService.ActivateUser(code);
 
-                var keys = _storeKeyAccessor.FindByCurrentResourcePath().ToBlockingEnumerable();
+                var keys = _storeKeyAccessor.FindByKeyPart("api/users").ToBlockingEnumerable();
                 await _validatorValueInvalidator.MarkForInvalidation(keys);
                 return CreatedAtRoute("GetUser", new { userid = result.Id }, result);
             }
@@ -366,7 +366,6 @@ namespace SocialConsultations.Controllers
             "application/vnd.socialconsultations.user.full.hateoas+json",
             "application/vnd.socialconsultations.user.friendly+json",
             "application/vnd.socialconsultations.user.friendly.hateoas+json")]
-        [Authorize(Policy = "MustBeAdmin")]
         [HttpGet("{userid}", Name = "GetUser")]
         public async Task<IActionResult> GetUser(
             int userid,
@@ -502,7 +501,6 @@ namespace SocialConsultations.Controllers
         /// </summary>
         /// <param name="todeleteid"></param>
         /// <returns></returns>
-        [Authorize(Policy = "MustBeAdmin")]
         [HttpDelete("{todeleteid}", Name = "DeleteUser")]
         public async Task<ActionResult> DeleteCategory(int todeleteid)
         {
@@ -523,7 +521,6 @@ namespace SocialConsultations.Controllers
         /// <param name="toupdateid"></param>
         /// <param name="item"></param>
         /// <returns></returns>
-        [Authorize(Policy = "MustBeAdmin")]
         [HttpPut("{toupdateid}", Name = "UpdateUser")]
         public async Task<IActionResult> UpdateUser(int toupdateid, UserForUpdateDto item)
         {

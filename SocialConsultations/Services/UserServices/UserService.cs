@@ -178,7 +178,7 @@ namespace SocialConsultations.Services.UserServices
 
             await _basicRepository.AddAsync(createdUser);
             await _basicRepository.SaveChangesAsync();
-            var url = $"{_configuration["SiteData:BaseUrl"]}"+$"api/users/{createdUser.ConfirmationCode}";
+            var url = $"{_configuration["SiteData:BaseUrl"]}"+$"api/users/confirm/{createdUser.ConfirmationCode}";
             await _emailSender.SendEmailAsync(user.Email, "Confirm your account",
                 $"Please confirm your account by clicking <a href='{url}'>here</a>");
 
