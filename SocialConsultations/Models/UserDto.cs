@@ -11,11 +11,15 @@ namespace SocialConsultations.Models
 
         public string Name { get; set; }
 
+
         public string Surname { get; set; }
+
 
         public string Email { get; set; }
 
-        public bool Confirmed { get; set; } = false;
+        public DateTime BirthDate { get; set; }
+
+        public bool Confirmed { get; set; }
 
 
     }

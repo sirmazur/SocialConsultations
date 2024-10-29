@@ -12,5 +12,6 @@ namespace SocialConsultations.Services.UserServices
         public Task<UserDto> CreateUser(UserForClientCreation user);
         public string GenerateToken(UserFullDto user);
         public Task<UserFullDto> ActivateUser(Guid code);
+        public Task RemindPassword(string email);
     }
 }

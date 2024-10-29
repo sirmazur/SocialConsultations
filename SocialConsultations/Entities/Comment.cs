@@ -9,7 +9,7 @@ namespace SocialConsultations.Entities
         public int Id { get; set; }
         [Required]
         [MinLength(1)]
-        public string Content { get; set; }
+        public string Content { get; set; }        
         public ICollection<User> Upvotes { get; set; } = new List<User>();
     }
 }

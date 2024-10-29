@@ -57,6 +57,7 @@ namespace SocialConsultations.Controllers
             }
         }
 
+
         /// <summary>
         /// Creates a user
         /// </summary>
@@ -72,6 +73,28 @@ namespace SocialConsultations.Controllers
                 var keys = _storeKeyAccessor.FindByKeyPart("api/users").ToBlockingEnumerable();
                 await _validatorValueInvalidator.MarkForInvalidation(keys);
                 return CreatedAtRoute("GetUser", new { userid = result.Id }, result);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Creates a user
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        [HttpPost("getpassword")]
+        public async Task<ActionResult<UserDto>> GetPassword(string email)
+        {
+            try
+            {
+                await _userService.RemindPassword(email);
+
+                var keys = _storeKeyAccessor.FindByKeyPart("api/users").ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys);
+                return NoContent();
             }
             catch (Exception e)
             {
@@ -522,8 +545,13 @@ namespace SocialConsultations.Controllers
         /// <param name="item"></param>
         /// <returns></returns>
         [HttpPut("{toupdateid}", Name = "UpdateUser")]
+        [Authorize(Policy = "MustBeLoggedIn")]
         public async Task<IActionResult> UpdateUser(int toupdateid, UserForUpdateDto item)
         {
+            if(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value) != toupdateid)
+            {
+                return Unauthorized();
+            }
             var operationResult = await _userService.UpdateAsync(toupdateid, item);
             if (operationResult.IsSuccess)
             {
@@ -545,6 +573,10 @@ namespace SocialConsultations.Controllers
         [HttpPatch("{toupdateid}", Name = "PartialUpdateUser")]
         public async Task<IActionResult> PartialUpdateUser(int toupdateid, JsonPatchDocument<UserForUpdateDto> patchDocument)
         {
+            if (int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value) != toupdateid)
+            {
+                return Unauthorized();
+            }
             var operationResult = await _userService.PartialUpdateAsync(toupdateid, patchDocument);
             if (operationResult.IsSuccess)
             {

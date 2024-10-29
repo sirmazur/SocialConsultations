@@ -29,8 +29,12 @@ namespace SocialConsultations.Entities
 
         public Guid ConfirmationCode { get; set; } = Guid.NewGuid();
 
+        public ICollection<Comment> UpvotedComments { get; set; } = new List<Comment>();
+
         public FileData? Avatar { get; set; }
         public bool Confirmed { get; set; } = false;
+
+        public DateTime LastPasswordReminder { get; set; } = DateTime.UtcNow.AddDays(-10);
 
     }
 }

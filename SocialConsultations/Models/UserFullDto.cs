@@ -15,8 +15,6 @@ namespace SocialConsultations.Models
         public string Surname { get; set; }
 
 
-        public string Password { get; set; }
-
         public string Email { get; set; }
 
         public DateTime BirthDate { get; set; }
@@ -24,7 +22,7 @@ namespace SocialConsultations.Models
         public Guid ConfirmationCode { get; set; }
 
         public FileData? Avatar { get; set; }
-        public bool Confirmed { get; set; } = false;
+        public bool Confirmed { get; set; }
 
     }
 }

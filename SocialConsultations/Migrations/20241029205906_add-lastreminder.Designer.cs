@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialConsultations.DbContexts;
 
@@ -11,9 +12,11 @@ using SocialConsultations.DbContexts;
 namespace SocialConsultations.Migrations
 {
     [DbContext(typeof(ConsultationsContext))]
-    partial class ConsultationsContextModelSnapshot : ModelSnapshot
+    [Migration("20241029205906_add-lastreminder")]
+    partial class addlastreminder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace SocialConsultations.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("CommentUser", b =>
-                {
-                    b.Property<int>("UpvotedCommentsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UpvotesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UpvotedCommentsId", "UpvotesId");
-
-                    b.HasIndex("UpvotesId");
-
-                    b.ToTable("CommentUser");
-                });
 
             modelBuilder.Entity("SocialConsultations.Entities.Comment", b =>
                 {
@@ -139,6 +127,9 @@ namespace SocialConsultations.Migrations
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("CommentId")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("ConfirmationCode")
                         .HasColumnType("uniqueidentifier");
 
@@ -171,22 +162,9 @@ namespace SocialConsultations.Migrations
 
                     b.HasIndex("AvatarId");
 
+                    b.HasIndex("CommentId");
+
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("CommentUser", b =>
-                {
-                    b.HasOne("SocialConsultations.Entities.Comment", null)
-                        .WithMany()
-                        .HasForeignKey("UpvotedCommentsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SocialConsultations.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UpvotesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("SocialConsultations.Entities.User", b =>
@@ -195,7 +173,16 @@ namespace SocialConsultations.Migrations
                         .WithMany()
                         .HasForeignKey("AvatarId");
 
+                    b.HasOne("SocialConsultations.Entities.Comment", null)
+                        .WithMany("Upvotes")
+                        .HasForeignKey("CommentId");
+
                     b.Navigation("Avatar");
+                });
+
+            modelBuilder.Entity("SocialConsultations.Entities.Comment", b =>
+                {
+                    b.Navigation("Upvotes");
                 });
 #pragma warning restore 612, 618
         }

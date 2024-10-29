@@ -157,6 +157,24 @@ namespace SocialConsultations.Services.UserServices
        
         }
 
+        public async Task RemindPassword(string email)
+        {
+            var user = await _basicRepository.GetQueryableAll().FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                throw new Exception("User with this email does not exist");
+            }
+            if(user.LastPasswordReminder.AddDays(7)>DateTime.UtcNow)
+            {
+                throw new Exception("You can remind password only once a week");
+            }
+            user.Password = Guid.NewGuid().ToString().Substring(0, 8);
+            user.LastPasswordReminder = DateTime.UtcNow;
+            await _basicRepository.SaveChangesAsync();
+            await _emailSender.SendEmailAsync(email, "New generated password",
+                $"Here is your new password. You can log in and set new password if needed: {user.Password}\n We wish you succesful consulting!");
+        }
+
 
         public async Task<UserDto> CreateUser(UserForClientCreation user)
         {
