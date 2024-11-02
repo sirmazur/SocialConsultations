@@ -10,6 +10,7 @@ using SocialConsultations.DbContexts;
 using SocialConsultations.Entities;
 using SocialConsultations.Helpers;
 using SocialConsultations.Services.Basic;
+using SocialConsultations.Services.CommunityServices;
 using SocialConsultations.Services.FieldsValidationServices;
 using SocialConsultations.Services.UserServices;
 using System;
@@ -89,6 +90,9 @@ builder.Services.AddTransient<IFieldsValidationService, FieldsValidationService>
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBasicRepository<User>, BasicRepository<User>>();
+builder.Services.AddScoped<ICommunityService, CommunityService>();
+builder.Services.AddScoped<ICommunityRepository, CommunityRepository>();
+builder.Services.AddScoped<IBasicRepository<Community>, BasicRepository<Community>>();
 builder.Services.AddScoped<IStoreKeyAccessor, StoreKeyAccessor>();
 builder.Services.AddScoped<IValidatorValueInvalidator, ValidatorValueInvalidator>();
 builder.Services.AddTransient<EmailSender>();

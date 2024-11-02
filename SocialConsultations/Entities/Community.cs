@@ -13,6 +13,24 @@ namespace SocialConsultations.Entities
         [MaxLength(20)]
         public string Name { get; set; }
 
+        [Required]
+        [MaxLength(2000)]
+        public string Description { get; set; }
+
+        public FileData? Avatar { get; set; }
+
+        public FileData? Background { get; set; }
+
+        [InverseProperty("AdminCommunities")]
+        public List<User> Administrators { get; set; } = new List<User>();
+
+        [InverseProperty("MemberCommunities")]
+        public List<User> Members { get; set; } = new List<User>();
+
+        public List<Issue> Issues { get; set; } = new List<Issue>();
+
+        public List<JoinRequest> JoinRequests { get; set; } = new List<JoinRequest>();
+
         public bool IsPublic { get; set; }
     }
 }

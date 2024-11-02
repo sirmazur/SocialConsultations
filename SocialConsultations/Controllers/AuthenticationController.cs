@@ -2,12 +2,14 @@
 using SocialConsultations.Services.UserServices;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using Marvin.Cache.Headers;
 
 namespace SocialConsultations.Controllers
 {
     
     [ApiController]
     [Route("api/authentication")]
+    [HttpCacheIgnore]
     public class AuthenticationController : ControllerBase
     {
         private readonly IUserService _userService;

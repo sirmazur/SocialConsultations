@@ -31,6 +31,12 @@ namespace SocialConsultations.Entities
 
         public ICollection<Comment> UpvotedComments { get; set; } = new List<Comment>();
 
+        [InverseProperty("Administrators")]
+        public List<Community> AdminCommunities { get; set; } = new List<Community>();
+
+        [InverseProperty("Members")]
+        public List<Community> MemberCommunities { get; set; } = new List<Community>();
+
         public FileData? Avatar { get; set; }
         public bool Confirmed { get; set; } = false;
 
