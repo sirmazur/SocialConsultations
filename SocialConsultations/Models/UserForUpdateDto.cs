@@ -24,6 +24,9 @@ namespace SocialConsultations.Models
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+
+        public FileData? Avatar { get; set; }
+
         [Required]
         public DateTime BirthDate { get; set; }
 
