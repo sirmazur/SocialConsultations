@@ -3,6 +3,7 @@ using SocialConsultations.Services.UserServices;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using Marvin.Cache.Headers;
+using Marvin.Cache.Headers.Interfaces;
 
 namespace SocialConsultations.Controllers
 {
@@ -13,9 +14,13 @@ namespace SocialConsultations.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly IUserService _userService;
-        public AuthenticationController(IUserService userService)
+        private readonly IStoreKeyAccessor _storeKeyAccessor;
+        private readonly IValidatorValueInvalidator _validatorValueInvalidator;
+        public AuthenticationController(IUserService userService, IStoreKeyAccessor storeKeyAccessor, IValidatorValueInvalidator validatorValueInvalidator)
         {
             _userService = userService;
+            _storeKeyAccessor=storeKeyAccessor;
+            _validatorValueInvalidator=validatorValueInvalidator;
         }
 
         /// <summary>
@@ -35,7 +40,8 @@ namespace SocialConsultations.Controllers
             {
                 return Unauthorized(e.Message);
             }
-            
+            var keys = _storeKeyAccessor.FindByKeyPart("api/users/self").ToBlockingEnumerable();
+            await _validatorValueInvalidator.MarkForInvalidation(keys);
             var token = _userService.GenerateToken(result);
             return Ok(token);
 
