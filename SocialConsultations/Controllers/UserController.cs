@@ -13,6 +13,8 @@ using System.Dynamic;
 using System.Security.Claims;
 using Marvin.Cache.Headers.Interfaces;
 using Marvin.Cache.Headers;
+using SocialConsultations.Entities;
+using System.Linq.Expressions;
 
 namespace SocialConsultations.Controllers
 {
@@ -430,7 +432,8 @@ namespace SocialConsultations.Controllers
 
             if (primaryMediaType == "vnd.socialconsultations.user.full")
             {
-                var fullItem = await _userService.GetExtendedByIdWithEagerLoadingAsync(userid);
+                Expression<Func<User, object>>[] includeProperties = { c => c.Avatar };
+                var fullItem = await _userService.GetExtendedByIdWithEagerLoadingAsync(userid, includeProperties);
                 var fullResourceToReturn = fullItem.ShapeDataForObject(fields) as IDictionary<string, object>;
                 if (includeLinks)
                 {
