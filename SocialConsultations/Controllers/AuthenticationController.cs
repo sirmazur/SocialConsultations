@@ -14,13 +14,9 @@ namespace SocialConsultations.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IStoreKeyAccessor _storeKeyAccessor;
-        private readonly IValidatorValueInvalidator _validatorValueInvalidator;
-        public AuthenticationController(IUserService userService, IStoreKeyAccessor storeKeyAccessor, IValidatorValueInvalidator validatorValueInvalidator)
+        public AuthenticationController(IUserService userService)
         {
             _userService = userService;
-            _storeKeyAccessor=storeKeyAccessor;
-            _validatorValueInvalidator=validatorValueInvalidator;
         }
 
         /// <summary>
@@ -39,9 +35,7 @@ namespace SocialConsultations.Controllers
             catch(Exception e)
             {
                 return Unauthorized(e.Message);
-            }
-            var keys = _storeKeyAccessor.FindByKeyPart("api/users/self").ToBlockingEnumerable();
-            await _validatorValueInvalidator.MarkForInvalidation(keys);
+            }                
             var token = _userService.GenerateToken(result);
             return Ok(token);
 

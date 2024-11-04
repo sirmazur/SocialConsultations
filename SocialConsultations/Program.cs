@@ -109,6 +109,7 @@ builder.Services.AddHttpCacheHeaders(
        (validationModelOptions) =>
        {
            validationModelOptions.MustRevalidate = true;
+           validationModelOptions.Vary = ["Accept", "Accept-Language", "Accept-Encoding", "Authorization"];
        });
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer(options =>
