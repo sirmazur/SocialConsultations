@@ -533,6 +533,8 @@ namespace SocialConsultations.Controllers
             var operationResult = await _userService.DeleteByIdAsync(todeleteid);
             if (operationResult.IsSuccess)
             {
+                var keys = _storeKeyAccessor.FindByKeyPart("api/users").ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys);
                 return NoContent();
             }
             else
@@ -558,6 +560,8 @@ namespace SocialConsultations.Controllers
             var operationResult = await _userService.UpdateAsync(toupdateid, item);
             if (operationResult.IsSuccess)
             {
+                var keys = _storeKeyAccessor.FindByKeyPart("api/users").ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys);
                 return NoContent();
             }
             else
@@ -583,6 +587,8 @@ namespace SocialConsultations.Controllers
             var operationResult = await _userService.PartialUpdateAsync(toupdateid, patchDocument);
             if (operationResult.IsSuccess)
             {
+                var keys = _storeKeyAccessor.FindByKeyPart("api/users").ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys);
                 return NoContent();
             }
             else
