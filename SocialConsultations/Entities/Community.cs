@@ -31,6 +31,9 @@ namespace SocialConsultations.Entities
 
         public List<JoinRequest> JoinRequests { get; set; } = new List<JoinRequest>();
 
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+
         public bool IsPublic { get; set; }
     }
 }

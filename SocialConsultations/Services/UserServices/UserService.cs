@@ -190,7 +190,7 @@ namespace SocialConsultations.Services.UserServices
                 Surname = user.Surname,
                 Password = user.Password,
                 Email = user.Email,
-                BirthDate = user.BirthDate
+                BirthDate = user.BirthDate,                
             };
 
             var createdUser = _mapper.Map<User>(userToCreate);

@@ -31,6 +31,8 @@ namespace SocialConsultations.Services.CommunityServices
                 Avatar = community.Avatar,
                 Background = community.Background,
                 Administrators = users,
+                Latitude = community.Latitude,
+                Longitude = community.Longitude,
                 IsPublic = community.IsPublic
             };
             return communityToReturn;
