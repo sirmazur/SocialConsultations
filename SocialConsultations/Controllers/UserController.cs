@@ -88,7 +88,7 @@ namespace SocialConsultations.Controllers
         /// <param name="code"></param>
         /// <returns></returns>
         [HttpPost("getpassword")]
-        public async Task<ActionResult<UserDto>> GetPassword(string email)
+        public async Task<ActionResult<UserDto>> GetPassword([FromBody] string email)
         {
             try
             {
