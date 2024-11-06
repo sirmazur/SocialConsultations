@@ -528,7 +528,7 @@ namespace SocialConsultations.Controllers
         /// <param name="todeleteid"></param>
         /// <returns></returns>
         [HttpDelete("{todeleteid}", Name = "DeleteUser")]
-        public async Task<ActionResult> DeleteCategory(int todeleteid)
+        public async Task<ActionResult> DeleteUser(int todeleteid)
         {
             var operationResult = await _userService.DeleteByIdAsync(todeleteid);
             if (operationResult.IsSuccess)
