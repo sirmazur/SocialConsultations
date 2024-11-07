@@ -504,7 +504,8 @@ namespace SocialConsultations.Controllers
 
             if (primaryMediaType == "vnd.socialconsultations.user.full")
             {
-                var fullItem = await _userService.GetExtendedByIdWithEagerLoadingAsync(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value));
+                Expression<Func<User, object>>[] includeProperties = { c => c.Avatar };
+                var fullItem = await _userService.GetExtendedByIdWithEagerLoadingAsync(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value),includeProperties);
                 var fullResourceToReturn = fullItem.ShapeDataForObject(fields) as IDictionary<string, object>;
                 if (includeLinks)
                 {
