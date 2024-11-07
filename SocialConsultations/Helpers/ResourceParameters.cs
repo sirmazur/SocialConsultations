@@ -7,14 +7,14 @@ namespace SocialConsultations.Helpers
     /// </summary>
     public class ResourceParameters
     {
-        const int maxPageSize = 200;
+        const int maxPageSize = 100000;
         /// <summary>
         /// Search query string
         /// </summary>
         public string? SearchQuery { get; set; }
         public int PageNumber { get; set; } = 1;
 
-        private int _pageSize = 100;
+        private int _pageSize = 100000;
         public int PageSize
         {
             get => _pageSize;
