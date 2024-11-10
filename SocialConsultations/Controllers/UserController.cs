@@ -529,8 +529,13 @@ namespace SocialConsultations.Controllers
         /// <param name="todeleteid"></param>
         /// <returns></returns>
         [HttpDelete("{todeleteid}", Name = "DeleteUser")]
+        [Authorize(Policy = "MustBeLoggedIn")]
         public async Task<ActionResult> DeleteUser(int todeleteid)
         {
+            if (int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value) != todeleteid)
+            {
+                return Unauthorized();
+            }
             var operationResult = await _userService.DeleteByIdAsync(todeleteid);
             if (operationResult.IsSuccess)
             {
@@ -557,6 +562,14 @@ namespace SocialConsultations.Controllers
             if(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value) != toupdateid)
             {
                 return Unauthorized();
+            }
+            var user = await _userService.GetUserByEmail(item.Email);
+            if (user is not null)
+            {
+                if (user.Id != toupdateid)
+                {
+                    return BadRequest("Email is already taken");
+                }
             }
             var operationResult = await _userService.UpdateAsync(toupdateid, item);
             if (operationResult.IsSuccess)
@@ -585,6 +598,26 @@ namespace SocialConsultations.Controllers
             {
                 return Unauthorized();
             }
+            bool exists = false;
+            patchDocument.Operations.ForEach(async op =>
+            {
+                if (op.path == "/email" && op.OperationType == Microsoft.AspNetCore.JsonPatch.Operations.OperationType.Replace)
+                {
+                    var user = await _userService.GetUserByEmail(op.value.ToString());
+                    if (user is not null)
+                    {
+                        if (user.Id != toupdateid)
+                        {
+                            exists = true;
+                        }
+                    }
+                }
+            });
+            if (exists)
+            {
+                return BadRequest("Email is already taken");
+            }
+
             var operationResult = await _userService.PartialUpdateAsync(toupdateid, patchDocument);
             if (operationResult.IsSuccess)
             {

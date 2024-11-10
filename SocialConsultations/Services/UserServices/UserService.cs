@@ -96,6 +96,12 @@ namespace SocialConsultations.Services.UserServices
             return finalListToReturn;
         }
 
+        public async Task<UserFullDto?> GetUserByEmail(string email)
+        {
+            var user = await _userRepository.GetUserByEmail(email);
+            return _mapper.Map<UserFullDto>(user);
+        }
+
         public async override Task<PagedList<UserDto>> GetAllWithEagerLoadingAsync(IEnumerable<IFilter>? filters,
             ResourceParameters parameters,
             params Expression<Func<User,
