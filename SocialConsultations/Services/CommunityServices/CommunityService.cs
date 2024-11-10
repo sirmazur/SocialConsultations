@@ -37,5 +37,11 @@ namespace SocialConsultations.Services.CommunityServices
             };
             return communityToReturn;
         }
+
+        public async Task<List<CommunityFullDto>> GetClosestCommunities(Location location, int amount)
+        {
+            var communities = await _basicRepository.GetQueryableAll().Include(c=>c.Avatar).OrderBy(c => Math.Sqrt(Math.Pow(c.Latitude - location.Latitude, 2) + Math.Pow(c.Longitude - location.Longitude, 2))).Take(amount).ToListAsync();
+            return _mapper.Map<List<CommunityFullDto>>(communities);
+        }
     }
 }

@@ -110,6 +110,15 @@ namespace SocialConsultations.Controllers
             return Ok(lightResourceToReturn);
         }
 
+        [HttpPost("/closest/{amount}", Name = "GetClosest")]
+        public async Task<IActionResult> GetClosestCommunities(Location location, int amount)
+        {
+            var communities = await _communityService.GetClosestCommunities(location, amount);
+            return Ok(communities);
+        }
+
+        
+
         /// <summary>
         /// Gets communitys, requires admin token
         /// </summary>
