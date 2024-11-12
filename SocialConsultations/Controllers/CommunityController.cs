@@ -91,7 +91,7 @@ namespace SocialConsultations.Controllers
 
             if (primaryMediaType == "vnd.socialconsultations.community.full")
             {
-                Expression<Func<Community, object>>[] includeProperties = { c => c.Avatar, d => d.Background, e => e.Administrators, f => f.Members, g => g.Issues };
+                Expression<Func<Community, object>>[] includeProperties = { c => c.Avatar, d => d.Background, e => e.Administrators, f => f.Members, g => g.Issues, h => h.JoinRequests };
                 var fullItem = await _communityService.GetExtendedByIdWithEagerLoadingAsync(communityid, includeProperties);
                 var fullResourceToReturn = fullItem.ShapeDataForObject(fields) as IDictionary<string, object>;
                 if (includeLinks)
@@ -108,6 +108,74 @@ namespace SocialConsultations.Controllers
                 lightResourceToReturn.Add("links", links);
             }
             return Ok(lightResourceToReturn);
+        }
+
+        [HttpPost("{communityid}/joinrequests", Name = "PostJoinRequest")]
+        [Authorize(Policy = "MustBeLoggedIn")]
+        public async Task<IActionResult> CreateJoinRequest(
+            int communityid)
+        {
+            try
+            {
+                await _communityService.CreateJoinRequest(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value), communityid);
+            }
+            catch
+            (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            return NoContent();
+        }
+
+        [HttpPost("{communityid}/joinrequests/{joinrequestid}/accept", Name = "AcceptJoinRequest")]
+        [Authorize(Policy = "MustBeLoggedIn")]
+        public async Task<IActionResult> AcceptJoinRequest(
+            int communityid, int joinrequestid)
+        {
+            Expression<Func<Community, object>>[] includeProperties = { c => c.Administrators };
+            var community = await _communityService.GetEntityByIdWithEagerLoadingAsync(communityid, includeProperties);
+            var adminIds = community.Administrators.Select(a => a.Id).ToList();
+
+            if (!adminIds.Contains(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value)))
+            {
+                return Unauthorized();
+            }
+            try
+            {
+                    await _communityService.AcceptJoinRequest(joinrequestid, communityid);
+            }
+            catch
+            (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            return NoContent();
+        }
+
+        [HttpPost("{communityid}/joinrequests/{joinrequestid}/reject", Name = "RejectJoinRequest")]
+        [Authorize(Policy = "MustBeLoggedIn")]
+        public async Task<IActionResult> RejectJoinRequest(
+            int communityid, int joinrequestid)
+        {
+            Expression<Func<Community, object>>[] includeProperties = { c => c.Administrators };
+            var community = await _communityService.GetEntityByIdWithEagerLoadingAsync(communityid, includeProperties);
+            var adminIds = community.Administrators.Select(a => a.Id).ToList();
+
+            if (!adminIds.Contains(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value)))
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                await _communityService.AcceptJoinRequest(joinrequestid, communityid);
+            }
+            catch
+            (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            return NoContent();
         }
 
         [HttpPost("/closest/{amount}", Name = "GetClosest")]
@@ -173,7 +241,7 @@ namespace SocialConsultations.Controllers
                 PagedList<CommunityFullDto>? communities = null;
                 try
                 {
-                    Expression<Func<Community, object>>[] includeProperties = { c => c.Avatar, d => d.Background, e => e.Administrators, f => f.Members, g => g.Issues };
+                    Expression<Func<Community, object>>[] includeProperties = { c => c.Avatar, d => d.Background, e => e.Administrators, f => f.Members, g => g.Issues, h => h.JoinRequests };
                     communities = await _communityService.GetFullAllWithEagerLoadingAsync(filters, resourceParameters, includeProperties);
                 }
                 catch (Exception ex)

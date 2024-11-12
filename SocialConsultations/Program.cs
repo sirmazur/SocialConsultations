@@ -92,6 +92,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBasicRepository<User>, BasicRepository<User>>();
 builder.Services.AddScoped<ICommunityService, CommunityService>();
 builder.Services.AddScoped<ICommunityRepository, CommunityRepository>();
+builder.Services.AddScoped<IBasicRepository<JoinRequest>, BasicRepository<JoinRequest>>();
 builder.Services.AddScoped<IBasicRepository<Community>, BasicRepository<Community>>();
 builder.Services.AddScoped<IStoreKeyAccessor, StoreKeyAccessor>();
 builder.Services.AddScoped<IValidatorValueInvalidator, ValidatorValueInvalidator>();

@@ -9,5 +9,8 @@ namespace SocialConsultations.Services.CommunityServices
     {
         public Task<CommunityForCreationDto> GetCommunityForCreationDto(CommunityForClientCreationDto community, int userid);
         public Task<List<CommunityFullDto>> GetClosestCommunities(Location location, int amount);
+        public Task CreateJoinRequest(int userId, int communityId);
+        public Task AcceptJoinRequest(int requestId, int communityId);
+        public Task RejectJoinRequest(int requestId, int communityId);
     }
 }

@@ -10,9 +10,7 @@ namespace SocialConsultations.Entities
 
         [Required]
         public User User { get; set; }
-
-        [Required]
-        public Community Community { get; set; }
+        public int UserId { get; set; }
 
         public InviteStatus Status { get; set; } = InviteStatus.Pending;
     }

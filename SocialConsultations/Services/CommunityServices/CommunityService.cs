@@ -14,11 +14,81 @@ namespace SocialConsultations.Services.CommunityServices
     {
         private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
-        public CommunityService(IMapper mapper, IConfiguration configuration, IBasicRepository<Community> basicRepository, IUserRepository userRepository) : base(mapper, basicRepository)
+        private readonly IBasicRepository<JoinRequest> _joinrequestRepository;
+        public CommunityService(IMapper mapper, IConfiguration configuration, IBasicRepository<Community> basicRepository, IUserRepository userRepository, IBasicRepository<JoinRequest> joinRequestRepository) : base(mapper, basicRepository)
         {
             _configuration = configuration;
             _userRepository = userRepository;
+            _joinrequestRepository = joinRequestRepository;
         }
+
+        public async Task CreateJoinRequest(int userId, int communityId)
+        {
+            var user = await _userRepository.GetUserById(userId);
+            var community = await _basicRepository.GetQueryableAll().Include(c => c.Members).Include(c => c.Administrators).Include(c => c.JoinRequests).FirstOrDefaultAsync(c => c.Id == communityId);
+            if (user is null)
+            {
+                throw new Exception("User not found");
+            }
+            else
+            if (community is null)
+            {
+                throw new Exception("Community not found");
+            }
+            else
+            if (community.Administrators.Select(c=>c.Id).Contains(userId) || community.Members.Select(c => c.Id).Contains(userId))
+            {
+                throw new Exception("User is already a member or administrator of this community");
+            }
+            else
+            if(community.JoinRequests.Where(c => c.User.Id == userId &&  c.Status==InviteStatus.Pending).Any())
+            {
+                throw new Exception("User has already requested to join this community");
+            }
+
+            community.JoinRequests.Add(
+                new JoinRequest() {
+                Status = InviteStatus.Pending,
+                User = user});
+            await _basicRepository.SaveChangesAsync();
+        }
+
+        public async Task AcceptJoinRequest(int requestId, int communityId)
+        {
+            var request = await _joinrequestRepository.GetQueryableAll().Include(c=>c.User).Where(d=>d.Id == requestId).FirstOrDefaultAsync() ?? throw new Exception("Request not found");
+            if (request.Status != InviteStatus.Pending)
+            {
+                throw new Exception("Request is already accepted or rejected");
+            }
+            var community = await _basicRepository.GetByIdAsync(communityId);
+            if (community is null)
+            {
+                throw new Exception("Community not found");
+            }
+            request.Status = InviteStatus.Accepted;
+            community.Members.Add(request.User);
+            await _basicRepository.SaveChangesAsync();
+            await _joinrequestRepository.SaveChangesAsync();
+        }
+
+        public async Task RejectJoinRequest(int requestId, int communityId)
+        {
+            var request = await _joinrequestRepository.GetByIdAsync(requestId);
+            if (request.Status != InviteStatus.Pending)
+            {
+                throw new Exception("Request is already accepted or rejected");
+            }
+            var community = await _basicRepository.GetByIdAsync(communityId);
+            if (community is null)
+            {
+                throw new Exception("Community not found");
+            }
+            request.Status = InviteStatus.Rejected;
+            await _basicRepository.SaveChangesAsync();
+            await _joinrequestRepository.SaveChangesAsync();
+        }
+
+
 
         public async Task<CommunityForCreationDto> GetCommunityForCreationDto(CommunityForClientCreationDto community, int userid)
         {
