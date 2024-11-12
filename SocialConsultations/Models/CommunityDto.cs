@@ -12,7 +12,6 @@ namespace SocialConsultations.Models
 
         public string Name { get; set; }
 
-
         public string Description { get; set; }
 
         public FileDataDto? Avatar { get; set; }

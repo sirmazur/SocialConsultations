@@ -6,5 +6,7 @@ namespace SocialConsultations.Entities
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+
+        public List<>
     }
 }
