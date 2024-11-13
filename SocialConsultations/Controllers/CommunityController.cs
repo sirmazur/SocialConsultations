@@ -124,6 +124,8 @@ namespace SocialConsultations.Controllers
             {
                 return BadRequest(e.Message);
             }
+            var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
+            await _validatorValueInvalidator.MarkForInvalidation(keys);
             return NoContent();
         }
 
@@ -149,6 +151,8 @@ namespace SocialConsultations.Controllers
             {
                 return BadRequest(e.Message);
             }
+            var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
+            await _validatorValueInvalidator.MarkForInvalidation(keys);
             return NoContent();
         }
 
@@ -168,13 +172,15 @@ namespace SocialConsultations.Controllers
 
             try
             {
-                await _communityService.AcceptJoinRequest(joinrequestid, communityid);
+                await _communityService.RejectJoinRequest(joinrequestid, communityid);
             }
             catch
             (Exception e)
             {
                 return BadRequest(e.Message);
             }
+            var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
+            await _validatorValueInvalidator.MarkForInvalidation(keys);
             return NoContent();
         }
 
@@ -476,7 +482,7 @@ namespace SocialConsultations.Controllers
                 var communityForCreation = await _communityService.GetCommunityForCreationDto(community, int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value));
                 var result = await _communityService.CreateAsync(communityForCreation);
 
-                var keys = _storeKeyAccessor.FindByCurrentResourcePath().ToBlockingEnumerable();
+                var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
                 await _validatorValueInvalidator.MarkForInvalidation(keys);
                 return CreatedAtRoute("GetCommunity", new { communityid = result.Id }, result);
             }
@@ -497,16 +503,16 @@ namespace SocialConsultations.Controllers
         public async Task<IActionResult> UpdateCommunity(int toupdateid, CommunityForUpdateDto item)
         {
             Expression<Func<Community, object>>[] includeProperties = { c => c.Administrators };
-            var community = await _communityService.GetEntityByIdWithEagerLoadingAsync(toupdateid, includeProperties);
-            var adminIds = community.Administrators.Select(a => a.Id).ToList();
-
-            if (!adminIds.Contains(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value)))
+            var isAllowed = await _communityService.ValidateAdmin(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value), toupdateid);
+            if (!isAllowed)
             {
                 return Unauthorized();
             }
             var operationResult = await _communityService.UpdateAsync(toupdateid, item);
             if (operationResult.IsSuccess)
             {
+                var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys);
                 return NoContent();
             }
             else
@@ -533,6 +539,35 @@ namespace SocialConsultations.Controllers
             var operationResult = await _communityService.PartialUpdateAsync(toupdateid, patchDocument);
             if (operationResult.IsSuccess)
             {
+                var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys);
+                return NoContent();
+            }
+            else
+            {
+                return StatusCode(operationResult.HttpResponseCode, operationResult.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Deletes user by id, requires admin token
+        /// </summary>
+        /// <param name="todeleteid"></param>
+        /// <returns></returns>
+        [HttpDelete("{todeleteid}", Name = "DeleteCommunity")]
+        [Authorize(Policy = "MustBeLoggedIn")]
+        public async Task<ActionResult> DeleteUser(int todeleteid)
+        {
+            var isAllowed = await _communityService.ValidateAdmin(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value), todeleteid);
+            if (!isAllowed)
+            {
+                return Unauthorized();
+            }
+            var operationResult = await _communityService.DeleteByIdAsync(todeleteid);
+            if (operationResult.IsSuccess)
+            {
+                var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys);
                 return NoContent();
             }
             else
