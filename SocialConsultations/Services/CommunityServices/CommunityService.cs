@@ -43,7 +43,7 @@ namespace SocialConsultations.Services.CommunityServices
                 throw new Exception("User is already a member or administrator of this community");
             }
             else
-            if(community.JoinRequests.Where(c => c.User.Id == userId &&  c.Status==InviteStatus.Pending).Any())
+            if(community.JoinRequests.Where(c => c.UserId == userId &&  c.Status==InviteStatus.Pending).Any())
             {
                 throw new Exception("User has already requested to join this community");
             }
