@@ -99,7 +99,7 @@ builder.Services.AddScoped<IValidatorValueInvalidator, ValidatorValueInvalidator
 builder.Services.AddTransient<EmailSender>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddDbContext<ConsultationsContext>(options =>
-    options.UseSqlServer(connection));
+    options.UseSqlServer(connection).EnableSensitiveDataLogging());
 builder.Services.AddResponseCaching();
 builder.Services.AddHttpCacheHeaders(
        (expirationModelOptions) =>

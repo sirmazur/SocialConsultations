@@ -8,7 +8,7 @@ namespace SocialConsultations.Models
     {
         public int Id { get; set; }
 
-        public User User { get; set; }
+        public UserDto User { get; set; }
         public int UserId { get; set; }
 
         public InviteStatus Status { get; set; }

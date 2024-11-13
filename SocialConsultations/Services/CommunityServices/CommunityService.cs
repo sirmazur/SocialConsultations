@@ -6,7 +6,9 @@ using SocialConsultations.Helpers;
 using SocialConsultations.Models;
 using SocialConsultations.Services.Basic;
 using SocialConsultations.Services.UserServices;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
 
 namespace SocialConsultations.Services.CommunityServices
 {
@@ -69,6 +71,39 @@ namespace SocialConsultations.Services.CommunityServices
             community.Members.Add(request.User);
             await _basicRepository.SaveChangesAsync();
             await _joinrequestRepository.SaveChangesAsync();
+        }
+
+        public async Task<bool> ValidateAdmin(int userId, int communityId)
+        {
+            Expression<Func<Community, object>>[] includeProperties = { c => c.Administrators };
+            var community = await GetExtendedByIdWithEagerLoadingNoTrackingAsync(communityId, includeProperties);
+            var adminIds = community.Administrators.Select(a => a.Id).ToList();
+            await _basicRepository.SaveChangesAsync();
+            if (!adminIds.Contains(userId))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public async Task<bool> ValidateMember(int userId, int communityId)
+        {
+            Expression<Func<Community, object>>[] includeProperties = { c => c.Administrators, d=>d.Members };
+            var community = await GetExtendedByIdWithEagerLoadingNoTrackingAsync(communityId, includeProperties);
+            var adminIds = community.Administrators.Select(a => a.Id).ToList();
+            var userIds = community.Members.Select(a => a.Id).ToList();
+            await _basicRepository.SaveChangesAsync();
+            if (!adminIds.Contains(userId) && !userIds.Contains(userId))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public async Task RejectJoinRequest(int requestId, int communityId)

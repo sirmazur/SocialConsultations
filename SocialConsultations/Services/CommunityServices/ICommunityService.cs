@@ -2,6 +2,7 @@
 using SocialConsultations.Helpers;
 using SocialConsultations.Models;
 using SocialConsultations.Services.Basic;
+using System.Linq.Expressions;
 
 namespace SocialConsultations.Services.CommunityServices
 {
@@ -12,5 +13,7 @@ namespace SocialConsultations.Services.CommunityServices
         public Task CreateJoinRequest(int userId, int communityId);
         public Task AcceptJoinRequest(int requestId, int communityId);
         public Task RejectJoinRequest(int requestId, int communityId);
+        public Task<bool> ValidateAdmin(int userId, int communityId);
+        public Task<bool> ValidateMember(int userId, int communityId);
     }
 }

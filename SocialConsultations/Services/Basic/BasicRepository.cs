@@ -66,6 +66,18 @@ namespace SocialConsultations.Services.Basic
             return await query.SingleOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
         }
 
+        public async Task<TEntity> GetByIdWithEagerLoadingNoTrackingAsync(int id, params Expression<Func<TEntity, object>>[] includeProperties)
+        {
+            var query = _context.Set<TEntity>().AsNoTracking();
+
+            foreach (var includeProperty in includeProperties)
+            {
+                query = query.Include(includeProperty);
+            }
+
+            return await query.SingleOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
+        }
+
         public IQueryable<TEntity> GetQueryableAllWithEagerLoadingAsync(params Expression<Func<TEntity, object>>[] includeProperties)
         {
             var query = _context.Set<TEntity>().AsQueryable();

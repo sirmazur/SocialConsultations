@@ -525,11 +525,8 @@ namespace SocialConsultations.Controllers
         [HttpPatch("{toupdateid}", Name = "PartialUpdateCommunity")]
         public async Task<IActionResult> PartialUpdateCommunity(int toupdateid, JsonPatchDocument<CommunityForUpdateDto> patchDocument)
         {
-            Expression<Func<Community, object>>[] includeProperties = { c => c.Administrators};
-            var community = await _communityService.GetEntityByIdWithEagerLoadingAsync(toupdateid, includeProperties);
-            var adminIds = community.Administrators.Select(a => a.Id).ToList();
-
-            if (!adminIds.Contains(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value)))
+            var isAllowed = await _communityService.ValidateAdmin(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value), toupdateid);
+            if (!isAllowed)
             {
                 return Unauthorized();
             }
