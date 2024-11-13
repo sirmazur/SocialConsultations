@@ -73,6 +73,14 @@ namespace SocialConsultations.Services.CommunityServices
             await _joinrequestRepository.SaveChangesAsync();
         }
 
+        public async Task<CommunityFullDto> GetExtendedByIdWithEagerLoadingAsyncCustom(int id)
+        {
+            var item = await _basicRepository.GetQueryableAll().Include(c => c.Administrators).Include(c => c.Members).Include(c => c.JoinRequests).ThenInclude(c=>c.User)
+                .Include(c => c.Avatar).Include(d => d.Background).Include(g => g.Issues).FirstOrDefaultAsync(c => c.Id == id);
+            var itemToReturn = _mapper.Map<CommunityFullDto>(item);
+            return itemToReturn;
+        }
+
         public async Task<bool> ValidateAdmin(int userId, int communityId)
         {
             Expression<Func<Community, object>>[] includeProperties = { c => c.Administrators };

@@ -15,5 +15,6 @@ namespace SocialConsultations.Services.CommunityServices
         public Task RejectJoinRequest(int requestId, int communityId);
         public Task<bool> ValidateAdmin(int userId, int communityId);
         public Task<bool> ValidateMember(int userId, int communityId);
+        public Task<CommunityFullDto> GetExtendedByIdWithEagerLoadingAsyncCustom(int id);
     }
 }

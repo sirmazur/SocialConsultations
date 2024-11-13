@@ -91,8 +91,8 @@ namespace SocialConsultations.Controllers
 
             if (primaryMediaType == "vnd.socialconsultations.community.full")
             {
-                Expression<Func<Community, object>>[] includeProperties = { c => c.Avatar, d => d.Background, e => e.Administrators, f => f.Members, g => g.Issues, h => h.JoinRequests };
-                var fullItem = await _communityService.GetExtendedByIdWithEagerLoadingAsync(communityid, includeProperties);
+                //Expression<Func<Community, object>>[] includeProperties = { c => c.Avatar, d => d.Background, e => e.Administrators, f => f.Members, g => g.Issues, h => h.JoinRequests };
+                var fullItem = await _communityService.GetExtendedByIdWithEagerLoadingAsyncCustom(communityid);
                 var fullResourceToReturn = fullItem.ShapeDataForObject(fields) as IDictionary<string, object>;
                 if (includeLinks)
                 {
