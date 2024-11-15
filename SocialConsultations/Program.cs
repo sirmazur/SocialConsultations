@@ -92,13 +92,14 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBasicRepository<User>, BasicRepository<User>>();
 builder.Services.AddScoped<ICommunityService, CommunityService>();
 builder.Services.AddScoped<ICommunityRepository, CommunityRepository>();
+builder.Services.AddScoped<IBasicRepository<JoinRequest>, BasicRepository<JoinRequest>>();
 builder.Services.AddScoped<IBasicRepository<Community>, BasicRepository<Community>>();
 builder.Services.AddScoped<IStoreKeyAccessor, StoreKeyAccessor>();
 builder.Services.AddScoped<IValidatorValueInvalidator, ValidatorValueInvalidator>();
 builder.Services.AddTransient<EmailSender>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddDbContext<ConsultationsContext>(options =>
-    options.UseSqlServer(connection));
+    options.UseSqlServer(connection).EnableSensitiveDataLogging());
 builder.Services.AddResponseCaching();
 builder.Services.AddHttpCacheHeaders(
        (expirationModelOptions) =>

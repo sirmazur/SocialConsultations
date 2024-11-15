@@ -12,6 +12,7 @@ namespace SocialConsultations.Profiles
             CreateMap<UserForUpdateDto, User>();
             CreateMap<User, UserForUpdateDto>();
             CreateMap<User, UserDto>();
+            CreateMap<UserDto, User>();
             CreateMap<User, UserFullDto>();
         }
     }

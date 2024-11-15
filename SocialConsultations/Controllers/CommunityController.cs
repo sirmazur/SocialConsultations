@@ -91,8 +91,8 @@ namespace SocialConsultations.Controllers
 
             if (primaryMediaType == "vnd.socialconsultations.community.full")
             {
-                Expression<Func<Community, object>>[] includeProperties = { c => c.Avatar, d => d.Background, e => e.Administrators, f => f.Members, g => g.Issues };
-                var fullItem = await _communityService.GetExtendedByIdWithEagerLoadingAsync(communityid, includeProperties);
+                //Expression<Func<Community, object>>[] includeProperties = { c => c.Avatar, d => d.Background, e => e.Administrators, f => f.Members, g => g.Issues, h => h.JoinRequests };
+                var fullItem = await _communityService.GetExtendedByIdWithEagerLoadingAsyncCustom(communityid);
                 var fullResourceToReturn = fullItem.ShapeDataForObject(fields) as IDictionary<string, object>;
                 if (includeLinks)
                 {
@@ -108,6 +108,80 @@ namespace SocialConsultations.Controllers
                 lightResourceToReturn.Add("links", links);
             }
             return Ok(lightResourceToReturn);
+        }
+
+        [HttpPost("{communityid}/joinrequests", Name = "PostJoinRequest")]
+        [Authorize(Policy = "MustBeLoggedIn")]
+        public async Task<IActionResult> CreateJoinRequest(
+            int communityid)
+        {
+            try
+            {
+                await _communityService.CreateJoinRequest(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value), communityid);
+            }
+            catch
+            (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
+            await _validatorValueInvalidator.MarkForInvalidation(keys);
+            return NoContent();
+        }
+
+        [HttpPost("{communityid}/joinrequests/{joinrequestid}/accept", Name = "AcceptJoinRequest")]
+        [Authorize(Policy = "MustBeLoggedIn")]
+        public async Task<IActionResult> AcceptJoinRequest(
+            int communityid, int joinrequestid)
+        {
+            Expression<Func<Community, object>>[] includeProperties = { c => c.Administrators };
+            var community = await _communityService.GetEntityByIdWithEagerLoadingAsync(communityid, includeProperties);
+            var adminIds = community.Administrators.Select(a => a.Id).ToList();
+
+            if (!adminIds.Contains(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value)))
+            {
+                return Unauthorized();
+            }
+            try
+            {
+                    await _communityService.AcceptJoinRequest(joinrequestid, communityid);
+            }
+            catch
+            (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
+            await _validatorValueInvalidator.MarkForInvalidation(keys);
+            return NoContent();
+        }
+
+        [HttpPost("{communityid}/joinrequests/{joinrequestid}/reject", Name = "RejectJoinRequest")]
+        [Authorize(Policy = "MustBeLoggedIn")]
+        public async Task<IActionResult> RejectJoinRequest(
+            int communityid, int joinrequestid)
+        {
+            Expression<Func<Community, object>>[] includeProperties = { c => c.Administrators };
+            var community = await _communityService.GetEntityByIdWithEagerLoadingAsync(communityid, includeProperties);
+            var adminIds = community.Administrators.Select(a => a.Id).ToList();
+
+            if (!adminIds.Contains(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value)))
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                await _communityService.RejectJoinRequest(joinrequestid, communityid);
+            }
+            catch
+            (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
+            await _validatorValueInvalidator.MarkForInvalidation(keys);
+            return NoContent();
         }
 
         [HttpPost("/closest/{amount}", Name = "GetClosest")]
@@ -173,7 +247,7 @@ namespace SocialConsultations.Controllers
                 PagedList<CommunityFullDto>? communities = null;
                 try
                 {
-                    Expression<Func<Community, object>>[] includeProperties = { c => c.Avatar, d => d.Background, e => e.Administrators, f => f.Members, g => g.Issues };
+                    Expression<Func<Community, object>>[] includeProperties = { c => c.Avatar, d => d.Background, e => e.Administrators, f => f.Members, g => g.Issues, h => h.JoinRequests };
                     communities = await _communityService.GetFullAllWithEagerLoadingAsync(filters, resourceParameters, includeProperties);
                 }
                 catch (Exception ex)
@@ -408,7 +482,7 @@ namespace SocialConsultations.Controllers
                 var communityForCreation = await _communityService.GetCommunityForCreationDto(community, int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value));
                 var result = await _communityService.CreateAsync(communityForCreation);
 
-                var keys = _storeKeyAccessor.FindByCurrentResourcePath().ToBlockingEnumerable();
+                var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
                 await _validatorValueInvalidator.MarkForInvalidation(keys);
                 return CreatedAtRoute("GetCommunity", new { communityid = result.Id }, result);
             }
@@ -429,16 +503,16 @@ namespace SocialConsultations.Controllers
         public async Task<IActionResult> UpdateCommunity(int toupdateid, CommunityForUpdateDto item)
         {
             Expression<Func<Community, object>>[] includeProperties = { c => c.Administrators };
-            var community = await _communityService.GetEntityByIdWithEagerLoadingAsync(toupdateid, includeProperties);
-            var adminIds = community.Administrators.Select(a => a.Id).ToList();
-
-            if (!adminIds.Contains(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value)))
+            var isAllowed = await _communityService.ValidateAdmin(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value), toupdateid);
+            if (!isAllowed)
             {
                 return Unauthorized();
             }
             var operationResult = await _communityService.UpdateAsync(toupdateid, item);
             if (operationResult.IsSuccess)
             {
+                var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys);
                 return NoContent();
             }
             else
@@ -457,17 +531,43 @@ namespace SocialConsultations.Controllers
         [HttpPatch("{toupdateid}", Name = "PartialUpdateCommunity")]
         public async Task<IActionResult> PartialUpdateCommunity(int toupdateid, JsonPatchDocument<CommunityForUpdateDto> patchDocument)
         {
-            Expression<Func<Community, object>>[] includeProperties = { c => c.Administrators};
-            var community = await _communityService.GetEntityByIdWithEagerLoadingAsync(toupdateid, includeProperties);
-            var adminIds = community.Administrators.Select(a => a.Id).ToList();
-
-            if (!adminIds.Contains(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value)))
+            var isAllowed = await _communityService.ValidateAdmin(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value), toupdateid);
+            if (!isAllowed)
             {
                 return Unauthorized();
             }
             var operationResult = await _communityService.PartialUpdateAsync(toupdateid, patchDocument);
             if (operationResult.IsSuccess)
             {
+                var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys);
+                return NoContent();
+            }
+            else
+            {
+                return StatusCode(operationResult.HttpResponseCode, operationResult.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Deletes user by id, requires admin token
+        /// </summary>
+        /// <param name="todeleteid"></param>
+        /// <returns></returns>
+        [HttpDelete("{todeleteid}", Name = "DeleteCommunity")]
+        [Authorize(Policy = "MustBeLoggedIn")]
+        public async Task<ActionResult> DeleteUser(int todeleteid)
+        {
+            var isAllowed = await _communityService.ValidateAdmin(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value), todeleteid);
+            if (!isAllowed)
+            {
+                return Unauthorized();
+            }
+            var operationResult = await _communityService.DeleteByIdAsync(todeleteid);
+            if (operationResult.IsSuccess)
+            {
+                var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys);
                 return NoContent();
             }
             else

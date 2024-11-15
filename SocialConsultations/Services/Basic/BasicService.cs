@@ -60,6 +60,13 @@ namespace SocialConsultations.Services.Basic
             return itemToReturn;
         }
 
+        public async Task<TExtendedDto> GetExtendedByIdWithEagerLoadingNoTrackingAsync(int id, params Expression<Func<TEntity, object>>[] includeProperties)
+        {
+            var item = await _basicRepository.GetByIdWithEagerLoadingNoTrackingAsync(id, includeProperties);
+            var itemToReturn = _mapper.Map<TExtendedDto>(item);
+            return itemToReturn;
+        }
+
         public async Task<TEntity> GetEntityByIdWithEagerLoadingAsync(int id, params Expression<Func<TEntity, object>>[] includeProperties)
         {
             return await _basicRepository.GetByIdWithEagerLoadingAsync(id, includeProperties);
