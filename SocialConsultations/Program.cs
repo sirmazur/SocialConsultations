@@ -142,7 +142,8 @@ builder.Services.AddCors(options =>
             builder.WithOrigins("http://localhost:5173")
                    .AllowAnyHeader()
                    .AllowAnyMethod()
-                   .AllowCredentials();
+                   .AllowCredentials()
+                   .WithExposedHeaders("x-pagination"); 
         });
 });
 var app = builder.Build();
