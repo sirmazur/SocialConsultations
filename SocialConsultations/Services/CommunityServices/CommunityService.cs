@@ -153,7 +153,25 @@ namespace SocialConsultations.Services.CommunityServices
 
         public async Task<List<CommunityFullDto>> GetClosestCommunities(Location location, int amount)
         {
-            var communities = await _basicRepository.GetQueryableAll().Include(c=>c.Avatar).OrderBy(c => Math.Sqrt(Math.Pow(c.Latitude - location.Latitude, 2) + Math.Pow(c.Longitude - location.Longitude, 2))).Take(amount).ToListAsync();
+            const double EarthRadiusKm = 6371;
+
+            var communities = await _basicRepository.GetQueryableAll()
+                .Include(c => c.Avatar)
+                .Where(c =>
+                    EarthRadiusKm * 2 * Math.Asin(Math.Sqrt(
+                        Math.Pow(Math.Sin((Math.PI / 180) * (c.Latitude - location.Latitude) / 2), 2) +
+                        Math.Cos((Math.PI / 180) * location.Latitude) * Math.Cos((Math.PI / 180) * c.Latitude) *
+                        Math.Pow(Math.Sin((Math.PI / 180) * (c.Longitude - location.Longitude) / 2), 2)
+                    )) <= location.MaxDistanceKm)
+                .OrderBy(c =>
+                    EarthRadiusKm * 2 * Math.Asin(Math.Sqrt(
+                        Math.Pow(Math.Sin((Math.PI / 180) * (c.Latitude - location.Latitude) / 2), 2) +
+                        Math.Cos((Math.PI / 180) * location.Latitude) * Math.Cos((Math.PI / 180) * c.Latitude) *
+                        Math.Pow(Math.Sin((Math.PI / 180) * (c.Longitude - location.Longitude) / 2), 2)
+                    )))
+                .Take(amount)
+                .ToListAsync();
+
             return _mapper.Map<List<CommunityFullDto>>(communities);
         }
     }

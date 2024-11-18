@@ -9,7 +9,7 @@ namespace SocialConsultations.DbContexts
         public DbSet<Community> Communities { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Issue> Issues { get; set; }
-        public DbSet<Poll> Polls { get; set; }
+        public DbSet<Solution> Solutions { get; set; }
 
         public ConsultationsContext(DbContextOptions<ConsultationsContext> options)
             : base(options)

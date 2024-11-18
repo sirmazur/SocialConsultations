@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialConsultations.DbContexts;
 
@@ -11,13 +12,15 @@ using SocialConsultations.DbContexts;
 namespace SocialConsultations.Migrations
 {
     [DbContext(typeof(ConsultationsContext))]
-    partial class ConsultationsContextModelSnapshot : ModelSnapshot
+    [Migration("20241118191121_set_no_action11")]
+    partial class set_no_action11
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -75,11 +78,21 @@ namespace SocialConsultations.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("IssueId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("IssueId");
 
                     b.ToTable("Comments");
                 });
@@ -142,10 +155,20 @@ namespace SocialConsultations.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("IssueId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SolutionId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IssueId");
+
+                    b.HasIndex("SolutionId");
 
                     b.ToTable("FileData");
                 });
@@ -158,8 +181,25 @@ namespace SocialConsultations.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CommunityId")
+                    b.Property<int>("CommunityId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CurrentStateEndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IssueStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -194,7 +234,7 @@ namespace SocialConsultations.Migrations
                     b.ToTable("JoinRequest");
                 });
 
-            modelBuilder.Entity("SocialConsultations.Entities.Poll", b =>
+            modelBuilder.Entity("SocialConsultations.Entities.Solution", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -202,9 +242,22 @@ namespace SocialConsultations.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IssueId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Polls");
+                    b.HasIndex("IssueId");
+
+                    b.ToTable("Solutions");
                 });
 
             modelBuilder.Entity("SocialConsultations.Entities.User", b =>
@@ -244,6 +297,9 @@ namespace SocialConsultations.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<int?>("SolutionId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -252,6 +308,8 @@ namespace SocialConsultations.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AvatarId");
+
+                    b.HasIndex("SolutionId");
 
                     b.ToTable("Users");
                 });
@@ -301,33 +359,66 @@ namespace SocialConsultations.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SocialConsultations.Entities.Comment", b =>
+                {
+                    b.HasOne("SocialConsultations.Entities.User", "Author")
+                        .WithMany("Comments")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SocialConsultations.Entities.Issue", null)
+                        .WithMany("Comments")
+                        .HasForeignKey("IssueId");
+
+                    b.Navigation("Author");
+                });
+
             modelBuilder.Entity("SocialConsultations.Entities.Community", b =>
                 {
                     b.HasOne("SocialConsultations.Entities.FileData", "Avatar")
                         .WithMany()
-                        .HasForeignKey("AvatarId");
+                        .HasForeignKey("AvatarId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("SocialConsultations.Entities.FileData", "Background")
                         .WithMany()
-                        .HasForeignKey("BackgroundId");
+                        .HasForeignKey("BackgroundId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Avatar");
 
                     b.Navigation("Background");
                 });
 
+            modelBuilder.Entity("SocialConsultations.Entities.FileData", b =>
+                {
+                    b.HasOne("SocialConsultations.Entities.Issue", null)
+                        .WithMany("Files")
+                        .HasForeignKey("IssueId");
+
+                    b.HasOne("SocialConsultations.Entities.Solution", null)
+                        .WithMany("Files")
+                        .HasForeignKey("SolutionId");
+                });
+
             modelBuilder.Entity("SocialConsultations.Entities.Issue", b =>
                 {
-                    b.HasOne("SocialConsultations.Entities.Community", null)
+                    b.HasOne("SocialConsultations.Entities.Community", "Community")
                         .WithMany("Issues")
-                        .HasForeignKey("CommunityId");
+                        .HasForeignKey("CommunityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Community");
                 });
 
             modelBuilder.Entity("SocialConsultations.Entities.JoinRequest", b =>
                 {
                     b.HasOne("SocialConsultations.Entities.Community", null)
                         .WithMany("JoinRequests")
-                        .HasForeignKey("CommunityId");
+                        .HasForeignKey("CommunityId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("SocialConsultations.Entities.User", "User")
                         .WithMany()
@@ -338,11 +429,26 @@ namespace SocialConsultations.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SocialConsultations.Entities.Solution", b =>
+                {
+                    b.HasOne("SocialConsultations.Entities.Issue", "Issue")
+                        .WithMany("Solutions")
+                        .HasForeignKey("IssueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Issue");
+                });
+
             modelBuilder.Entity("SocialConsultations.Entities.User", b =>
                 {
                     b.HasOne("SocialConsultations.Entities.FileData", "Avatar")
                         .WithMany()
                         .HasForeignKey("AvatarId");
+
+                    b.HasOne("SocialConsultations.Entities.Solution", null)
+                        .WithMany("UserVotes")
+                        .HasForeignKey("SolutionId");
 
                     b.Navigation("Avatar");
                 });
@@ -352,6 +458,27 @@ namespace SocialConsultations.Migrations
                     b.Navigation("Issues");
 
                     b.Navigation("JoinRequests");
+                });
+
+            modelBuilder.Entity("SocialConsultations.Entities.Issue", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Files");
+
+                    b.Navigation("Solutions");
+                });
+
+            modelBuilder.Entity("SocialConsultations.Entities.Solution", b =>
+                {
+                    b.Navigation("Files");
+
+                    b.Navigation("UserVotes");
+                });
+
+            modelBuilder.Entity("SocialConsultations.Entities.User", b =>
+                {
+                    b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
         }
