@@ -8,6 +8,9 @@ namespace SocialConsultations.Profiles
         {
             CreateMap<Entities.Issue, Models.IssueDto>();
             CreateMap<Models.IssueDto, Entities.Issue>();
+            CreateMap<Models.IssueForCreationDto, Entities.Issue>();
+            CreateMap<Models.IssueForUpdateDto, Entities.Issue>();
+            CreateMap<Entities.Issue, Models.IssueFullDto>();
         }
     }
 }

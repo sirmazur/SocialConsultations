@@ -17,21 +17,15 @@ namespace SocialConsultations.Entities
         [Required]
         [MaxLength(2000)]
         public string Description { get; set; }
-        [DeleteBehavior(DeleteBehavior.Cascade)]
         public FileData? Avatar { get; set; }
-        [DeleteBehavior(DeleteBehavior.Cascade)]
         public FileData? Background { get; set; }
 
         [InverseProperty("AdminCommunities")]
-        [DeleteBehavior(DeleteBehavior.Restrict)]
         public List<User> Administrators { get; set; } = new List<User>();
 
         [InverseProperty("MemberCommunities")]
-        [DeleteBehavior(DeleteBehavior.Restrict)]
         public List<User> Members { get; set; } = new List<User>();
-        [DeleteBehavior(DeleteBehavior.Cascade)]
         public List<Issue> Issues { get; set; } = new List<Issue>();
-        [DeleteBehavior(DeleteBehavior.Cascade)]
         public List<JoinRequest> JoinRequests { get; set; } = new List<JoinRequest>();
 
         public double Latitude { get; set; }

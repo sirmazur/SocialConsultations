@@ -15,5 +15,21 @@ namespace SocialConsultations.DbContexts
             : base(options)
         {
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.Author)        
+                .WithMany(u => u.Comments)    
+                .HasForeignKey(c => c.AuthorId) 
+                .OnDelete(DeleteBehavior.Cascade); 
+
+          
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.Author)
+                .WithMany(u => u.Comments)
+                .HasForeignKey(c => c.AuthorId)
+                .OnDelete(DeleteBehavior.Restrict); 
+        }
     }
 }

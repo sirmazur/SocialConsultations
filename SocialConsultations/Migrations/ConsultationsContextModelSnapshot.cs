@@ -3,7 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialConsultations.DbContexts;
 
@@ -12,11 +11,9 @@ using SocialConsultations.DbContexts;
 namespace SocialConsultations.Migrations
 {
     [DbContext(typeof(ConsultationsContext))]
-    [Migration("20241118191121_set_no_action11")]
-    partial class set_no_action11
+    partial class ConsultationsContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -364,7 +361,7 @@ namespace SocialConsultations.Migrations
                     b.HasOne("SocialConsultations.Entities.User", "Author")
                         .WithMany("Comments")
                         .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("SocialConsultations.Entities.Issue", null)
@@ -378,13 +375,11 @@ namespace SocialConsultations.Migrations
                 {
                     b.HasOne("SocialConsultations.Entities.FileData", "Avatar")
                         .WithMany()
-                        .HasForeignKey("AvatarId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("AvatarId");
 
                     b.HasOne("SocialConsultations.Entities.FileData", "Background")
                         .WithMany()
-                        .HasForeignKey("BackgroundId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("BackgroundId");
 
                     b.Navigation("Avatar");
 
@@ -417,8 +412,7 @@ namespace SocialConsultations.Migrations
                 {
                     b.HasOne("SocialConsultations.Entities.Community", null)
                         .WithMany("JoinRequests")
-                        .HasForeignKey("CommunityId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("CommunityId");
 
                     b.HasOne("SocialConsultations.Entities.User", "User")
                         .WithMany()

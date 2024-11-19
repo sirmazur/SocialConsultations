@@ -31,19 +31,15 @@ namespace SocialConsultations.Entities
         public Guid ConfirmationCode { get; set; } = Guid.NewGuid();
 
         [InverseProperty("Author")]
-        [DeleteBehavior(DeleteBehavior.Cascade)]
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
         [InverseProperty("Upvotes")]
-        [DeleteBehavior(DeleteBehavior.Restrict)]
         public ICollection<Comment> UpvotedComments { get; set; } = new List<Comment>();
 
         [InverseProperty("Administrators")]
-        [DeleteBehavior(DeleteBehavior.Restrict)]
         public List<Community> AdminCommunities { get; set; } = new List<Community>();
 
         [InverseProperty("Members")]
-        [DeleteBehavior(DeleteBehavior.Restrict)]
         public List<Community> MemberCommunities { get; set; } = new List<Community>();
 
         public FileData? Avatar { get; set; }

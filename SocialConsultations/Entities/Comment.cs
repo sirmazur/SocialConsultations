@@ -9,7 +9,6 @@ namespace SocialConsultations.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [InverseProperty("Comments")]
-        [DeleteBehavior(DeleteBehavior.Restrict)]
         public User Author { get; set; }
         public int AuthorId { get; set; }
         [Required]
@@ -17,7 +16,6 @@ namespace SocialConsultations.Entities
         public string Content { get; set; }
 
         [InverseProperty("UpvotedComments")]
-        [DeleteBehavior(DeleteBehavior.Restrict)]
         public ICollection<User> Upvotes { get; set; } = new List<User>();
     }
 }
