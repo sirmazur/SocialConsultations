@@ -185,31 +185,7 @@ namespace SocialConsultations.Controllers
             var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
             await _validatorValueInvalidator.MarkForInvalidation(keys);
             return NoContent();
-        }
-
-        [HttpPost("{communityid}/issues")]
-        [Authorize(Policy = "MustBeLoggedIn")]
-        public async Task<ActionResult<IssueDto>> CreateIssue(IssueForCreationDto issue, int communityid)
-        {
-            try
-            {
-                Expression<Func<Community, object>>[] includeProperties = { c => c.Administrators };
-                var isAllowed = await _communityService.ValidateAdmin(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value), communityid);
-                if (!isAllowed)
-                {
-                    return Unauthorized();
-                }
-                var result = await _issueService.CreateAsync(issue);
-
-                var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
-                await _validatorValueInvalidator.MarkForInvalidation(keys);
-                return CreatedAtRoute("GetIssue", new { issueid = result.Id }, result);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
+        }       
 
         [HttpPost("/closest/{amount}", Name = "GetClosest")]
         public async Task<IActionResult> GetClosestCommunities(Location location, int amount)
