@@ -203,7 +203,7 @@ namespace SocialConsultations.Services.Basic
 
                 Expression finalExpression = Expression.Constant(false);
 
-                if(filter is NumericFilter && searchProperty.PropertyType == typeof(int?) || searchProperty.PropertyType == typeof(int))
+                if(filter is NumericFilter && searchProperty.PropertyType == typeof(int?))
                 {
                     var propertyExpression = Expression.Property(parameter, searchProperty);
                     var filterValue = Expression.Constant(filter.Value, typeof(int?));
@@ -211,6 +211,14 @@ namespace SocialConsultations.Services.Basic
                     finalExpression = Expression.OrElse(finalExpression, equalsExpression);
                 }
                 else
+                if (filter is NumericFilter && searchProperty.PropertyType == typeof(int))
+            {
+                var propertyExpression = Expression.Property(parameter, searchProperty);
+                var filterValue = Expression.Constant(filter.Value, typeof(int));
+                var equalsExpression = Expression.Equal(propertyExpression, filterValue);
+                finalExpression = Expression.OrElse(finalExpression, equalsExpression);
+            }
+            else
                 if(filter is TextFilter && searchProperty.PropertyType == typeof(string))
                 {
                     var propertyExpression = Expression.Property(parameter, searchProperty);
