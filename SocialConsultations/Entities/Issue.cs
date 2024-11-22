@@ -22,10 +22,10 @@ namespace SocialConsultations.Entities
 
     public enum IssueStatus
     {
-        GatheringInformation,
-        Voting,
-        InProgress,
-        FeedbackCollection,
-        Completed
+        GatheringInformation, // commenting, adding files, adding solutions
+        Voting, // commenting, adding files, voting
+        InProgress, // commenting, adding files
+        FeedbackCollection, // commenting, adding files
+        Completed // no more interactions allowed
     }
 }

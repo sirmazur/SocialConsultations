@@ -208,7 +208,7 @@ namespace SocialConsultations.Controllers
 
             if(communityId is not null)
             {
-                filters.Add(new NumericFilter("CommunityId", communityId.Value));
+                filters.Add(new NumericFilter("CommunityId", (int)communityId));
             }
 
             var includeLinks = parsedMediaType.SubTypeWithoutSuffix
@@ -343,6 +343,81 @@ namespace SocialConsultations.Controllers
 
         }
 
+        [HttpPut("{toupdateid}", Name = "UpdateIssue")]
+        [Authorize(Policy = "MustBeLoggedIn")]
+        public async Task<IActionResult> UpdateIssue(int toupdateid, IssueForUpdateDto item)
+        {
+            var issue = await _issueService.GetByIdAsync(toupdateid);
+            var isAllowed = await _communityService.ValidateAdmin(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value), issue.CommunityId);
+            if (!isAllowed)
+            {
+                return Unauthorized();
+            }
+            var operationResult = await _issueService.UpdateAsync(toupdateid, item);
+            if (operationResult.IsSuccess)
+            {
+                var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys);
+                var keys2 = _storeKeyAccessor.FindByKeyPart("api/issues").ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys2);
+                return NoContent();
+            }
+            else
+            {
+                return StatusCode(operationResult.HttpResponseCode, operationResult.ErrorMessage);
+            }
+        }
+
+        [Authorize(Policy = "MustBeLoggedIn")]
+        [HttpPatch("{toupdateid}", Name = "PartialUpdateIssue")]
+        public async Task<IActionResult> PartialUpdateIssue(int toupdateid, JsonPatchDocument<IssueForUpdateDto> patchDocument)
+        {
+            var issue = await _issueService.GetByIdAsync(toupdateid);
+            var isAllowed = await _communityService.ValidateAdmin(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value), issue.CommunityId);
+            if (!isAllowed)
+            {
+                return Unauthorized();
+            }
+            var operationResult = await _issueService.PartialUpdateAsync(toupdateid, patchDocument);
+            if (operationResult.IsSuccess)
+            {
+                var keys = _storeKeyAccessor.FindByKeyPart("api/issues").ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys);
+                var keys2 = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys2);
+                return NoContent();
+            }
+            else
+            {
+                return StatusCode(operationResult.HttpResponseCode, operationResult.ErrorMessage);
+            }
+        }
+
+        [HttpDelete("{todeleteid}", Name = "DeleteIssue")]
+        [Authorize(Policy = "MustBeLoggedIn")]
+        public async Task<ActionResult> DeleteIssue(int todeleteid)
+        {
+            var issue = await _issueService.GetByIdAsync(todeleteid);
+            var isAllowed = await _communityService.ValidateAdmin(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value), issue.CommunityId);
+            if (!isAllowed)
+            {
+                return Unauthorized();
+            }
+            var operationResult = await _issueService.DeleteByIdAsync(todeleteid);
+            if (operationResult.IsSuccess)
+            {
+                var keys = _storeKeyAccessor.FindByKeyPart("api/communities").ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys);
+                var keys2 = _storeKeyAccessor.FindByKeyPart("api/issues").ToBlockingEnumerable();
+                await _validatorValueInvalidator.MarkForInvalidation(keys2);
+                return NoContent();
+            }
+            else
+            {
+                return StatusCode(operationResult.HttpResponseCode, operationResult.ErrorMessage);
+            }
+        }
+
         private IEnumerable<LinkDto> CreateLinks(
             int issueid,
             string? fields)
@@ -405,5 +480,6 @@ namespace SocialConsultations.Controllers
             }
             return links;
         }
+
     }
 }

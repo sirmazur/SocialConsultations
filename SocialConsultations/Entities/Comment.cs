@@ -17,5 +17,10 @@ namespace SocialConsultations.Entities
 
         [InverseProperty("UpvotedComments")]
         public ICollection<User> Upvotes { get; set; } = new List<User>();
+
+        //public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        //public IssueStatus IssueStatus { get; set; }
+
     }
 }
