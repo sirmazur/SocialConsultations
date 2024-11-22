@@ -183,7 +183,7 @@ namespace SocialConsultations.Controllers
           "application/vnd.socialconsultations.issue.friendly.hateoas+json")]
         [HttpGet(Name = "GetIssues")]
         [HttpHead]
-        public async Task<IActionResult> GetIssues([FromQuery] IEnumerable<int>? ids, [FromQuery] ResourceParameters resourceParameters, [FromHeader(Name = "Accept")] string? mediaType)
+        public async Task<IActionResult> GetIssues([FromQuery] IEnumerable<int>? ids, [FromQuery] ResourceParameters resourceParameters, int? communityId, [FromHeader(Name = "Accept")] string? mediaType)
         {
             if (!MediaTypeHeaderValue.TryParse(mediaType, out MediaTypeHeaderValue parsedMediaType))
             {
@@ -204,6 +204,11 @@ namespace SocialConsultations.Controllers
             if (ids is not null && ids.Count()>0)
             {
                 filters.Add(new NumericFilter("Ids", ids));
+            }
+
+            if(communityId is not null)
+            {
+                filters.Add(new NumericFilter("CommunityId", communityId.Value));
             }
 
             var includeLinks = parsedMediaType.SubTypeWithoutSuffix
