@@ -156,7 +156,7 @@ namespace SocialConsultations.Services.CommunityServices
             const double EarthRadiusKm = 6371;
 
             var communities = await _basicRepository.GetQueryableAll()
-                .Include(c => c.Avatar)
+                .Include(c => c.Avatar).Include(d => d.Members)
                 .Where(c =>
                     EarthRadiusKm * 2 * Math.Asin(Math.Sqrt(
                         Math.Pow(Math.Sin((Math.PI / 180) * (c.Latitude - location.Latitude) / 2), 2) +
