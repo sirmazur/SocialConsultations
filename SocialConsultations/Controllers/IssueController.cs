@@ -114,7 +114,7 @@ namespace SocialConsultations.Controllers
             if (primaryMediaType == "vnd.socialconsultations.issue.full")
             {
                 Expression<Func<Issue, object>>[] includeProperties = { c => c.Files, d => d.Solutions, e => e.Comments };
-                var fullItem = await _issueService.GetExtendedByIdWithEagerLoadingAsync(issueid);
+                var fullItem = await _issueService.GetExtendedByIdWithEagerLoadingAsync(issueid, includeProperties);
                 var fullResourceToReturn = fullItem.ShapeDataForObject(fields) as IDictionary<string, object>;
                 if (includeLinks)
                 {
