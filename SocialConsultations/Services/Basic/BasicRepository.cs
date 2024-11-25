@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Reflection.Metadata.Ecma335;
 using System.Xml.Linq;
+using SocialConsultations.Entities;
 
 namespace SocialConsultations.Services.Basic
 {
@@ -23,6 +24,10 @@ namespace SocialConsultations.Services.Basic
 
         public async Task<TEntity> GetByIdAsync(int id)
         {
+            if(typeof(TEntity) == typeof(Issue))
+            {
+                return await _context.Set<Issue>().Include(c => c.Files).FirstOrDefaultAsync(c => c.Id == id) as TEntity;
+            }
             return await _context.Set<TEntity>().FindAsync(id);
         }
 

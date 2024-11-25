@@ -13,7 +13,8 @@ namespace SocialConsultations.Entities
         public string Description { get; set; }
         [Required]
         public DataType Type { get; set; }
-        
+
+        public DateTime CreateDate { get; set; } = DateTime.UtcNow;
     }
     public enum DataType
     {

@@ -12,7 +12,7 @@ namespace SocialConsultations.Entities
         [DeleteBehavior(DeleteBehavior.Restrict)]
         public Community Community { get; set; }
         public int CommunityId { get; set; }
-        [DeleteBehavior(DeleteBehavior.Cascade)]
+        [DeleteBehavior(DeleteBehavior.SetNull)]
         public List<FileData> Files { get; set; } = new List<FileData>();
         [DeleteBehavior(DeleteBehavior.Cascade)]
         public List<Solution> Solutions { get; set; } = new List<Solution>();
