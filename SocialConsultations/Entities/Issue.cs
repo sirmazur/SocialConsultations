@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SocialConsultations.Entities
 {
@@ -8,11 +9,15 @@ namespace SocialConsultations.Entities
         public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
+        [DeleteBehavior(DeleteBehavior.Restrict)]
         public Community Community { get; set; }
         public int CommunityId { get; set; }
+        [DeleteBehavior(DeleteBehavior.Cascade)]
         public List<FileData> Files { get; set; } = new List<FileData>();
+        [DeleteBehavior(DeleteBehavior.Cascade)]
         public List<Solution> Solutions { get; set; } = new List<Solution>();
         public IssueStatus IssueStatus { get; set; } = IssueStatus.GatheringInformation;
+        [DeleteBehavior(DeleteBehavior.Cascade)]
         public List<Comment> Comments { get; set; } = new List<Comment>();
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;

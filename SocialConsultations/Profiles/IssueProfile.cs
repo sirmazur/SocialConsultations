@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SocialConsultations.Entities;
 
 namespace SocialConsultations.Profiles
 {
@@ -8,6 +9,7 @@ namespace SocialConsultations.Profiles
         {
             CreateMap<Entities.Issue, Models.IssueDto>();
             CreateMap<Models.IssueDto, Entities.Issue>();
+            CreateMap<Issue, Models.IssueForUpdateDto>();
             CreateMap<Models.IssueForCreationDto, Entities.Issue>();
             CreateMap<Models.IssueForUpdateDto, Entities.Issue>();
             CreateMap<Entities.Issue, Models.IssueFullDto>();
