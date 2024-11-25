@@ -43,7 +43,7 @@ namespace SocialConsultations.Controllers
             _commentService=commentService;
         }
 
-        [HttpPost("upvotes/{commentid}")]
+        [HttpPost("{commentid}/upvotes")]
         [Authorize(Policy = "MustBeLoggedIn")]
         public async Task<ActionResult> ToggleUpvoteComment(int commentId)
         {
