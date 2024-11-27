@@ -105,7 +105,6 @@ namespace SocialConsultations.Services.CommentServices
                             graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
                             graphics.SmoothingMode = SmoothingMode.HighQuality;
 
-                            // Draw the resized image
                             graphics.DrawImage(originalImage, 0, 0, targetWidth, targetHeight);
                         }
 

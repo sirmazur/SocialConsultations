@@ -26,6 +26,7 @@ namespace SocialConsultations.Entities
         [InverseProperty("MemberCommunities")]
         public List<User> Members { get; set; } = new List<User>();
         public List<Issue> Issues { get; set; } = new List<Issue>();
+        [DeleteBehavior(DeleteBehavior.Cascade)]
         public List<JoinRequest> JoinRequests { get; set; } = new List<JoinRequest>();
 
         public double Latitude { get; set; }
