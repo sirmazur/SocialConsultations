@@ -108,6 +108,7 @@ namespace SocialConsultations.Services.CommunityServices
             else
             {
                 community.Members.Remove(user);
+                await _basicRepository.SaveChangesAsync();
             }
         }
 
