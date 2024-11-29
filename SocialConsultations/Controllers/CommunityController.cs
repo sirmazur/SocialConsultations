@@ -579,6 +579,26 @@ namespace SocialConsultations.Controllers
             }
         }
 
+        [HttpDelete("/{communityid}/members/{todeleteid}", Name = "DeleteMember")]
+        [Authorize(Policy = "MustBeLoggedIn")]
+        public async Task<ActionResult> DeleteMember(int communityid,int todeleteid)
+        {
+            var isAllowed = await _communityService.ValidateAdmin(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value), communityid);
+            if (!isAllowed)
+            {
+                return Unauthorized();
+            }
+            try 
+            {
+                await _communityService.RemoveMember(communityid, todeleteid);
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }           
+        }
+
         [HttpOptions()]
         public IActionResult GetCommunitiesOptions()
         {

@@ -97,7 +97,21 @@ namespace SocialConsultations.Services.CommunityServices
             }
         }
 
-        public async Task<bool> ValidateMember(int userId, int communityId)
+        public async Task RemoveMember(int communityId, int userId)
+        {
+            var community = await _basicRepository.GetQueryableAll().Include(c => c.Members).FirstOrDefaultAsync(c => c.Id == communityId);
+            var user = community.Members.FirstOrDefault(m => m.Id == userId);
+            if (user is null)
+            {
+                throw new Exception("User is not a member of this community");
+            }
+            else
+            {
+                community.Members.Remove(user);
+            }
+        }
+
+            public async Task<bool> ValidateMember(int userId, int communityId)
         {
             Expression<Func<Community, object>>[] includeProperties = { c => c.Administrators, d=>d.Members };
             var community = await GetExtendedByIdWithEagerLoadingNoTrackingAsync(communityId, includeProperties);

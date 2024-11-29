@@ -16,5 +16,6 @@ namespace SocialConsultations.Services.CommunityServices
         public Task<bool> ValidateAdmin(int userId, int communityId);
         public Task<bool> ValidateMember(int userId, int communityId);
         public Task<CommunityFullDto> GetExtendedByIdWithEagerLoadingAsyncCustom(int id);
+        public Task RemoveMember(int communityId, int userId);
     }
 }
