@@ -193,8 +193,7 @@ namespace SocialConsultations.Controllers
             var communities = await _communityService.GetClosestCommunities(location, amount);
             return Ok(communities);
         }
-
-        
+       
 
         /// <summary>
         /// Gets communitys, requires admin token

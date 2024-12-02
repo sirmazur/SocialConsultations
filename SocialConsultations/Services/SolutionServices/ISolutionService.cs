@@ -6,5 +6,6 @@ namespace SocialConsultations.Services.SolutionServices
 {
     public interface ISolutionService : IBasicService<SolutionDto, Solution, SolutionFullDto, SolutionForCreationDto, SolutionForUpdateDto>
     {
+        Task<SolutionFullDto> ToggleUpvoteSolution(int solutionId, int userId);
     }
 }

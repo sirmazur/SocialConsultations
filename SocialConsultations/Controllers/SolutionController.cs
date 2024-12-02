@@ -212,6 +212,31 @@ namespace SocialConsultations.Controllers
 
         }
 
+        [HttpPost("{solutionid}/upvotes")]
+        [Authorize(Policy = "MustBeLoggedIn")]
+        public async Task<ActionResult> ToggleUpvoteSolution(int solutionId)
+        {
+            try
+            {
+                var solution = await _solutionService.GetByIdAsync(solutionId);
+                var issue = await _issueService.GetByIdAsync(solution.IssueId);
+
+                var isAllowed = await _communityService.ValidateMember(int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value), issue.CommunityId);
+                if (!isAllowed)
+                {
+                    return Unauthorized();
+                }
+
+                var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+                var solutionToReturn = await _solutionService.ToggleUpvoteSolution(solutionId, userId);
+                return Ok(solutionToReturn);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [Produces("application/json",
             "application/vnd.socialconsultations.hateoas+json",
             "application/vnd.socialconsultations.solution.full+json",
