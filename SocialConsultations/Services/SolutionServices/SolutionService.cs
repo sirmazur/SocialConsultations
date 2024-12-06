@@ -35,7 +35,7 @@ namespace SocialConsultations.Services.SolutionServices
             {
                 throw new Exception("Voting is only allowed during voting issue status.");
             }
-            var solutions = _basicRepository.GetQueryableAll().Include(c => c.UserVotes).Where(d => d.UserVotes.Any(e => e.Id == userId) && d.Id != solutionId);
+            var solutions = _basicRepository.GetQueryableAll().Include(c => c.UserVotes).Where(d => d.UserVotes.Any(e => e.Id == userId) && d.Id != solutionId && d.IssueId == issue.Id);
             if(solutions is not null && solutions.Count()>0)
             {
                 throw new Exception("User already voted for another solution in this issue.");

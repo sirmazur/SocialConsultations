@@ -10,6 +10,7 @@ namespace SocialConsultations.Profiles
             CreateMap<Models.SolutionDto, Entities.Solution>();
             CreateMap<Models.SolutionForCreationDto, Entities.Solution>();
             CreateMap<Models.SolutionForUpdateDto, Entities.Solution>();
+            CreateMap<Entities.Solution, Models.SolutionForUpdateDto>();
             CreateMap<Entities.Solution, Models.SolutionFullDto>();
         }
     }
