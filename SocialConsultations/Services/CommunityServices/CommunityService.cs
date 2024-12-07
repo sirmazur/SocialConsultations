@@ -160,8 +160,7 @@ namespace SocialConsultations.Services.CommunityServices
                 Background = community.Background,
                 Administrators = users,
                 Latitude = community.Latitude,
-                Longitude = community.Longitude,
-                IsPublic = community.IsPublic
+                Longitude = community.Longitude
             };
             return communityToReturn;
         }

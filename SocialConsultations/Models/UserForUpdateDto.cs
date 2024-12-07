@@ -21,6 +21,8 @@ namespace SocialConsultations.Models
         [MinLength(7)]
         [MaxLength(20)]
         public string Password { get; set; }
+
+        public string Description { get; set; }
         [Required]
         [EmailAddress]
         public string Email { get; set; }

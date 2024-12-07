@@ -19,6 +19,8 @@ namespace SocialConsultations.Entities
         [MaxLength(30)]
         public string Surname { get; set; }
 
+        public string Description { get; set; }
+
         [Required]
         [MinLength(7)]
         [MaxLength(20)]

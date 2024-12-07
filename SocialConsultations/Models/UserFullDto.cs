@@ -17,6 +17,8 @@ namespace SocialConsultations.Models
 
         public string Email { get; set; }
 
+        public string Description { get; set; }
+
         public DateTime BirthDate { get; set; }
 
         public Guid ConfirmationCode { get; set; }
