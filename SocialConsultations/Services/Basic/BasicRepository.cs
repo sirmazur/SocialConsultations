@@ -28,6 +28,11 @@ namespace SocialConsultations.Services.Basic
             {
                 return await _context.Set<Issue>().Include(c => c.Files).FirstOrDefaultAsync(c => c.Id == id) as TEntity;
             }
+            else
+            if(typeof(TEntity) == typeof(Solution))
+            {
+                return await _context.Set<Solution>().Include(c => c.Files).FirstOrDefaultAsync(c => c.Id == id) as TEntity;
+            }
             return await _context.Set<TEntity>().FindAsync(id);
         }
 
