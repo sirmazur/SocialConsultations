@@ -35,6 +35,10 @@ namespace SocialConsultations.Services.UserServices
             {
                 throw new Exception("Wrong username or password");
             }
+            else if(account.Confirmed == false)
+            {
+                throw new Exception("Email is not confirmed. Please confirm your email in order to authenticate.");
+            }
             else
             {
                 return _mapper.Map<UserFullDto>(account);
