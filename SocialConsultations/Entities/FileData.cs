@@ -14,6 +14,8 @@ namespace SocialConsultations.Entities
         public string Description { get; set; }
         [Required]
         public DataType Type { get; set; }
+        [DeleteBehavior(DeleteBehavior.Restrict)]
+        public Solution? Solution { get; set; }
 
         public DateTime? DeletionMarkTimestamp { get; set; }
     }
