@@ -38,7 +38,7 @@ This repository focuses on the backend component, which is built using .NET 8 an
 - **Data Shaping**: Efficient data transfer by dynamically selecting required fields.
 - **Caching**: Improved performance with ETag-based caching.
 - **Pagination**: Efficient data retrieval with paginated API responses.
-- **Data Retention**: Automated cleanup of unused files and data.
+- **Data Retention**: Automated cleanup of unused files and data. Implemented using Azure automation runbook and sql stored procedure.
 
 ## Setup and Installation
 
